@@ -120,10 +120,6 @@ export default {
       });
     },
 
-    testando() {
-      console.log("está fazendo o resize");
-    },
-
     async sliderHandler() {
       await this.$nextTick();
 

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="tabs-container">
-      <Tabs nav-auto vertical slide-vertical>
+      <Tabs nav-auto>
         <TabItem name="My first tab">
           <div class="tab-item__content">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod sint

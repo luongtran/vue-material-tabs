@@ -1,7 +1,8 @@
 <template>
   <div v-resize="resizable" :class="classes">
-    <div v-if="pagination.has" class="tab-pagination__prev">
+    <div class="tab-pagination__prev">
       <Btn
+        v-if="pagination.has"
         :disabled="!paginateIndicator.previous"
         @click="paginationHandler('previous')"
       />
@@ -28,8 +29,9 @@
         <hr v-if="navSlider" class="tab__slider" />
       </ul>
     </nav>
-    <div v-if="pagination.has" class="tab-pagination__next">
+    <div class="tab-pagination__next">
       <Btn
+        v-if="pagination.has"
         :disabled="!paginateIndicator.next"
         @click="paginationHandler('next')"
       />
@@ -101,15 +103,19 @@ export default {
         previous: this.pagination.translate > 0,
       };
     },
+
+    orientation() {
+      return this.vertical ? "portrait" : "landscape";
+    },
   },
 
   watch: {
-    vertical: ["sliderHandler", "setPagination"],
+    vertical: ["sliderHandler", "setPaginationOffset"],
     tabItemActive: ["sliderHandler", "paginationBySomething"],
   },
 
   mounted() {
-    this.setPagination();
+    this.setPaginationOffset();
   },
 
   methods: {
@@ -145,40 +151,57 @@ export default {
         Object.assign(
           sliderElement.style,
           {
-            vertical: {
+            portrait: {
               height: `${height}px`,
               top: `${navActiveTop - navItemsTop}px`,
             },
-            horizontal: {
+            landscape: {
               width: `${width}px`,
               left: `${navActiveLeft - navItemsLeft}px`,
             },
-          }[this.vertical ? "vertical" : "horizontal"]
+          }[this.orientation]
         );
       }
     },
 
-    async setPagination() {
+    async setPaginationOffset() {
       await this.$nextTick();
 
-      this.pagination.translate = 0;
-      const offsetOrigin = this.vertical ? "offsetHeight" : "offsetWidth";
-      const navItemsOfsset = this.$refs.navItems[offsetOrigin];
-      const navOffset = this.$refs?.nav[offsetOrigin];
-      this.pagination.has = navItemsOfsset > navOffset;
-      if (this.pagination.has) {
-        let maxOffset = navItemsOfsset - navOffset;
-        // Temporary solution to get height og nav items when vertical is set
-        if (offsetOrigin === "offsetHeight") {
-          const height = [...this.$refs?.navItems.children].map(
-            ({ offsetHeight }) => offsetHeight
-          );
-          maxOffset = height.reduce((a, c) => a + c) - navOffset;
-        }
+      const navElement = this.$refs?.nav;
+      if (!navElement) return;
 
-        this.pagination.maxOffset = maxOffset;
-        this.pagination.offset = this.pagination.minOffset = navOffset;
-      }
+      const {
+        width: navItemsWidth,
+        height: navItemsHeight,
+      } = navElement.children[0].getBoundingClientRect();
+
+      const {
+        width: navWidth,
+        height: navHeight,
+      } = navElement.getBoundingClientRect();
+
+      const paginationFactory = (has, maxOffset, minOffset) => ({
+        has,
+        maxOffset,
+        minOffset,
+        offset: minOffset,
+      });
+
+      Object.assign(
+        this.pagination,
+        {
+          portrait: paginationFactory(
+            navItemsHeight > navHeight,
+            navItemsHeight - navHeight,
+            navHeight
+          ),
+          landscape: paginationFactory(
+            navItemsWidth > navWidth,
+            navItemsWidth - navWidth,
+            navWidth
+          ),
+        }[this.orientation]
+      );
     },
 
     paginationHandler(type) {
@@ -234,7 +257,7 @@ export default {
     },
 
     resizable() {
-      this.setPagination();
+      this.setPaginationOffset();
       this.sliderHandler();
     },
   },
@@ -267,7 +290,6 @@ export default {
   position: relative;
   display: flex;
   overflow: hidden;
-  margin: 0 0.3rem;
   flex: 1 100%;
 }
 

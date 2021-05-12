@@ -111,11 +111,12 @@ export default {
 
   watch: {
     vertical: ["sliderHandler", "setPaginationOffset"],
-    tabItemActive: ["sliderHandler", "paginationBySomething"],
+    tabItemActive: ["sliderHandler", "paginationByCollapse"],
   },
 
   mounted() {
     this.setPaginationOffset();
+    this.getElementRect(this.$refs.nav, "nav");
   },
 
   methods: {
@@ -129,56 +130,53 @@ export default {
     async sliderHandler() {
       await this.$nextTick();
 
-      const navActiveItemElement = this.$refs?.[this.tabItemActive.model]?.[0];
       const navItemsElement = this.$refs?.navItems;
-      if (navActiveItemElement && navItemsElement) {
-        const {
-          width,
-          height,
-          left: navActiveLeft,
-          top: navActiveTop,
-        } = navActiveItemElement.getBoundingClientRect();
+      const { navItemsLeft, navItemsTop } = this.getElementRect({
+        el: navItemsElement,
+        prefix: "navItems",
+      });
 
-        const {
-          left: navItemsLeft,
-          top: navItemsTop,
-        } = navItemsElement.getBoundingClientRect();
+      const {
+        navActiveWidth,
+        navActiveHeight,
+        navActiveLeft,
+        navActiveTop,
+      } = this.getElementRect({
+        el: this.$refs?.[this.tabItemActive.model]?.[0],
+        prefix: "navActive",
+      });
 
-        const { children } = navItemsElement;
-        const sliderElement = children[children.length - 1];
-        sliderElement.removeAttribute("style");
+      const { children } = navItemsElement;
+      const sliderEl = children[children.length - 1];
+      sliderEl.removeAttribute("style");
 
-        Object.assign(
-          sliderElement.style,
-          {
-            portrait: {
-              height: `${height}px`,
-              top: `${navActiveTop - navItemsTop}px`,
-            },
-            landscape: {
-              width: `${width}px`,
-              left: `${navActiveLeft - navItemsLeft}px`,
-            },
-          }[this.orientation]
-        );
-      }
+      Object.assign(
+        sliderEl.style,
+        {
+          portrait: {
+            height: `${navActiveHeight}px`,
+            top: `${navActiveTop - navItemsTop}px`,
+          },
+          landscape: {
+            width: `${navActiveWidth}px`,
+            left: `${navActiveLeft - navItemsLeft}px`,
+          },
+        }[this.orientation]
+      );
     },
 
     async setPaginationOffset() {
       await this.$nextTick();
 
-      const navElement = this.$refs?.nav;
-      if (!navElement) return;
+      const { navItemsWidth, navItemsHeight } = this.getElementRect({
+        el: this.$refs?.navItems,
+        prefix: "navItems",
+      });
 
-      const {
-        width: navItemsWidth,
-        height: navItemsHeight,
-      } = navElement.children[0].getBoundingClientRect();
-
-      const {
-        width: navWidth,
-        height: navHeight,
-      } = navElement.getBoundingClientRect();
+      const { navWidth, navHeight } = this.getElementRect({
+        el: this.$refs?.nav,
+        prefix: "nav",
+      });
 
       const paginationFactory = (has, maxOffset, minOffset) => ({
         has,
@@ -227,38 +225,45 @@ export default {
       }
     },
 
-    paginationBySomething({ model }) {
-      const navActiveItemElement = this.$refs?.[model]?.[0];
-      const navElement = this.$refs?.nav;
+    async paginationByCollapse({ model }) {
+      await this.$nextTick();
 
-      if (navActiveItemElement && navElement) {
-        let toTranslate = this.pagination.translate;
+      const { navActiveRight, navActiveLeft } = this.getElementRect({
+        el: this.$refs?.[model]?.[0],
+        prefix: "navActive",
+      });
 
-        const {
-          right: navActiveRight,
-          left: navActiveLeft,
-        } = navActiveItemElement.getBoundingClientRect();
+      const { navRight, navLeft } = this.getElementRect({
+        el: this.$refs?.nav,
+        prefix: "nav",
+      });
 
-        const {
-          right: navRight,
-          left: navLeft,
-        } = navElement.getBoundingClientRect();
+      let toTranslate = this.pagination.translate;
 
-        if (navActiveRight > navRight) {
-          toTranslate = toTranslate + (navActiveRight - navRight);
-        }
-
-        if (navActiveLeft < navLeft) {
-          toTranslate = toTranslate - (navLeft - navActiveLeft);
-        }
-
-        this.pagination.translate = Math.floor(toTranslate);
+      if (navActiveRight > navRight) {
+        toTranslate = toTranslate + (navActiveRight - navRight);
       }
+      if (navActiveLeft < navLeft) {
+        toTranslate = toTranslate - (navLeft - navActiveLeft);
+      }
+      this.pagination.translate = Math.floor(toTranslate);
     },
 
     resizable() {
       this.setPaginationOffset();
       this.sliderHandler();
+    },
+
+    getElementRect({ el, prefix }) {
+      if (!el) return;
+      const { parse, stringify } = JSON;
+      const rect = Object.entries(parse(stringify(el.getBoundingClientRect())));
+      const newRect = rect.map(([i, k]) => [
+        prefix + i.charAt(0).toUpperCase() + i.slice(1),
+        k,
+      ]);
+
+      return Object.fromEntries(newRect);
     },
   },
 };

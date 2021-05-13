@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="title">
-      <h1>vue-material-tabs <small>v0.0.3</small></h1>
+      <h1>vue-material-tabs <small>v0.0.4</small></h1>
       <a href="https://github.com/jairoblatt/vue-material-tabs" target="_blank">
         Docs
       </a>

@@ -8,15 +8,15 @@
     </div>
 
     <div class="btn-group">
-      <Btn @click="orientation = !orientation">
-        {{ orientation ? "Horizontal" : "Vertical" }}
+      <Btn @click="vertical = !vertical">
+        {{ vertical ? "Horizontal" : "Vertical" }}
       </Btn>
 
       <Btn @click="ripple = !ripple">
         Ripple
       </Btn>
 
-      <Btn @click="slider = !slider">
+      <Btn @click="navSlider = !navSlider">
         Slider
       </Btn>
 
@@ -29,7 +29,7 @@
       </Btn>
 
       <Btn @click="slideVertical = !slideVertical">
-        Slide Vertical
+        Slide vertical
       </Btn>
 
       <Btn @click="disabled = !disabled">
@@ -39,19 +39,19 @@
 
     <div class="tab-wrapper">
       <Tabs
-        :vertical="orientation"
-        :ripple="ripple"
-        :nav-slider="slider"
-        :dark="dark"
-        :slide="slide"
-        :slide-vertical="slideVertical"
+        v-bind="{
+          ripple,
+          navSlider,
+          slide,
+          dark,
+          ripple,
+          vertical,
+          slideVertical,
+        }"
       >
         <TabItem>
           <template #name>
-            <span>
-              <span> 🚀</span>
-              <p>Custom</p>
-            </span>
+            <span>Custom 🚀</span>
           </template>
 
           <div class="tab-content">
@@ -66,7 +66,6 @@
           <template #name>
             <span>
               <span> 🚚</span>
-              <p>Custom 2</p>
             </span>
           </template>
 
@@ -97,23 +96,24 @@
 </template>
 
 <script>
-export default {
-  name: "App",
+import Vue from "vue";
+import { Tabs, TabItem } from "vue-material-tabs";
+import Btn from "./Btn";
 
-  components: {
-    Btn: () => import("./Btn"),
-  },
+export default Vue.extend({
+  name: "ServeDev",
+  components: { Tabs, TabItem, Btn },
 
   data: () => ({
-    orientation: false,
+    vertical: false,
     ripple: true,
-    slider: true,
+    navSlider: true,
     dark: false,
     slide: true,
     disabled: false,
     slideVertical: false,
   }),
-};
+});
 </script>
 
 <style>
@@ -144,9 +144,7 @@ body {
   align-items: center;
   margin-bottom: 1rem;
   background: white;
-  width: 100%;
   border-radius: 5px;
-  box-shadow: 20px 20px 60px #e7e7e7, -20px -20px 60px #ffffff;
 }
 
 .btn-group .btn {
@@ -157,8 +155,7 @@ body {
 
 .tab-wrapper {
   height: 610px;
-  width: 100%;
-  box-shadow: 20px 20px 60px #e7e7e7, -20px -20px 60px #ffffff;
+  width: 900px;
 }
 
 .tab-content {
@@ -181,7 +178,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1rem;
+  color: rgb(23, 29, 43);
 }
 
 .title a {
@@ -195,7 +192,6 @@ body {
 
   .btn-group {
     width: 100%;
-    justify-content: flex-start;
   }
 
   .btn-group .btn {

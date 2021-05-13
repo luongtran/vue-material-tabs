@@ -19,7 +19,7 @@
   white-space: nowrap;
   background-color: #1867c0;
   cursor: pointer;
-  padding: 0.8rem 2rem;
+  padding: 0.6rem 2rem;
   color: white;
   transition: background 0.28s;
 }

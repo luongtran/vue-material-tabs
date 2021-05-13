@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="title">
-      <h1>vue-material-tabs <small>v0.0.1</small></h1>
+      <h1>vue-material-tabs <small>v0.0.3</small></h1>
       <a href="https://github.com/jairoblatt/vue-material-tabs" target="_blank">
         Docs
       </a>
@@ -28,6 +28,10 @@
         Slide
       </Btn>
 
+      <Btn @click="slideVertical = !slideVertical">
+        Slide Vertical
+      </Btn>
+
       <Btn @click="disabled = !disabled">
         Disabled
       </Btn>
@@ -40,6 +44,7 @@
         :nav-slider="slider"
         :dark="dark"
         :slide="slide"
+        :slide-vertical="slideVertical"
       >
         <TabItem>
           <template #name>
@@ -106,6 +111,7 @@ export default {
     dark: false,
     slide: true,
     disabled: false,
+    slideVertical: false,
   }),
 };
 </script>
@@ -137,18 +143,22 @@ body {
   justify-content: center;
   align-items: center;
   margin-bottom: 1rem;
+  background: white;
+  width: 100%;
+  border-radius: 5px;
+  box-shadow: 20px 20px 60px #e7e7e7, -20px -20px 60px #ffffff;
 }
 
 .btn-group .btn {
   margin: 0.6rem;
   flex: 1 auto;
-  width: 30%;
+  width: 10%;
 }
 
 .tab-wrapper {
   height: 610px;
   width: 100%;
-  box-shadow: rgba(0, 0, 0, 0.096) 10px 10px 90px;
+  box-shadow: 20px 20px 60px #e7e7e7, -20px -20px 60px #ffffff;
 }
 
 .tab-content {
@@ -171,6 +181,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 1rem;
 }
 
 .title a {
@@ -184,6 +195,7 @@ body {
 
   .btn-group {
     width: 100%;
+    justify-content: flex-start;
   }
 
   .btn-group .btn {

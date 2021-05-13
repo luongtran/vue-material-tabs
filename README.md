@@ -2,6 +2,8 @@
 
 Vue.js tabs component based in material design ❤
 
+## [Demo](https://vue-material-tabs.vercel.app/)
+
 ## 🚚 Install
 
 ```c

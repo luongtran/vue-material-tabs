@@ -11,6 +11,8 @@
 </template>
 
 <script>
+const crypto = require("crypto");
+
 export default {
   name: "TabItem",
   props: {
@@ -24,14 +26,8 @@ export default {
 
   data: () => ({
     activeModel: "",
-    model: "",
+    model: crypto.randomBytes(10).toString("hex"),
   }),
-
-  created() {
-    this.model = Math.random()
-      .toString(36)
-      .substring(2);
-  },
 
   computed: {
     tabs() {

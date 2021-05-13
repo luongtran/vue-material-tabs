@@ -275,7 +275,7 @@ var script$2 = {
     Btn: __vue_component__$3,
     VNode: {
       functional: true,
-      render: (h, ctx) => h("span", [ctx.props.node])
+      render: (_, ctx) => ctx.props.node
     }
   },
   directives: {
@@ -310,7 +310,7 @@ var script$2 = {
       return {
         tab__pagination: true,
         "tab__pagination--vertical": this.vertical,
-        "tabs__nav--auto": this.navAuto && !this.vertical
+        "tab__pagination--auto": this.navAuto && !this.vertical
       };
     },
 
@@ -325,16 +325,21 @@ var script$2 = {
         next: this.pagination.translate < this.pagination.maxOffset,
         previous: this.pagination.translate > 0
       };
+    },
+
+    orientation() {
+      return this.vertical ? "portrait" : "landscape";
     }
 
   },
   watch: {
-    vertical: ["sliderHandler", "setPagination"],
-    tabItemActive: ["sliderHandler", "paginationBySomething"]
+    vertical: ["sliderHandler", "setPaginationOffset"],
+    tabItemActive: ["sliderHandler", "paginationByCollapse"]
   },
 
   mounted() {
-    this.setPagination();
+    this.setPaginationOffset();
+    this.getElementRect(this.$refs.nav, "nav");
   },
 
   methods: {
@@ -345,71 +350,75 @@ var script$2 = {
       });
     },
 
-    testando() {
-      console.log("está fazendo o resize");
-    },
-
     async sliderHandler() {
-      var _this$$refs, _this$$refs$this$tabI, _this$$refs2;
+      var _this$$refs, _this$$refs2, _this$$refs2$this$tab;
 
       await this.$nextTick();
-      const navActiveItemElement = (_this$$refs = this.$refs) === null || _this$$refs === void 0 ? void 0 : (_this$$refs$this$tabI = _this$$refs[this.tabItemActive.model]) === null || _this$$refs$this$tabI === void 0 ? void 0 : _this$$refs$this$tabI[0];
-      const navItemsElement = (_this$$refs2 = this.$refs) === null || _this$$refs2 === void 0 ? void 0 : _this$$refs2.navItems;
-
-      if (navActiveItemElement && navItemsElement) {
-        const {
-          width,
-          height,
-          left: navActiveLeft,
-          top: navActiveTop
-        } = navActiveItemElement.getBoundingClientRect();
-        const {
-          left: navItemsLeft,
-          top: navItemsTop
-        } = navItemsElement.getBoundingClientRect();
-        const {
-          children
-        } = navItemsElement;
-        const sliderElement = children[children.length - 1];
-        sliderElement.removeAttribute("style");
-        Object.assign(sliderElement.style, {
-          vertical: {
-            height: `${height}px`,
-            top: `${navActiveTop - navItemsTop}px`
-          },
-          horizontal: {
-            width: `${width}px`,
-            left: `${navActiveLeft - navItemsLeft}px`
-          }
-        }[this.vertical ? "vertical" : "horizontal"]);
-      }
+      const navItemsElement = (_this$$refs = this.$refs) === null || _this$$refs === void 0 ? void 0 : _this$$refs.navItems;
+      const {
+        navItemsLeft,
+        navItemsTop
+      } = this.getElementRect({
+        el: navItemsElement,
+        prefix: "navItems"
+      });
+      const {
+        navActiveWidth,
+        navActiveHeight,
+        navActiveLeft,
+        navActiveTop
+      } = this.getElementRect({
+        el: (_this$$refs2 = this.$refs) === null || _this$$refs2 === void 0 ? void 0 : (_this$$refs2$this$tab = _this$$refs2[this.tabItemActive.model]) === null || _this$$refs2$this$tab === void 0 ? void 0 : _this$$refs2$this$tab[0],
+        prefix: "navActive"
+      });
+      const {
+        children
+      } = navItemsElement;
+      const sliderEl = children[children.length - 1];
+      sliderEl.removeAttribute("style");
+      Object.assign(sliderEl.style, {
+        portrait: {
+          height: `${navActiveHeight}px`,
+          top: `${navActiveTop - navItemsTop}px`
+        },
+        landscape: {
+          width: `${navActiveWidth}px`,
+          left: `${navActiveLeft - navItemsLeft}px`
+        }
+      }[this.orientation]);
     },
 
-    async setPagination() {
-      var _this$$refs3;
+    async setPaginationOffset() {
+      var _this$$refs3, _this$$refs4;
 
       await this.$nextTick();
-      this.pagination.translate = 0;
-      const offsetOrigin = this.vertical ? "offsetHeight" : "offsetWidth";
-      const navItemsOfsset = this.$refs.navItems[offsetOrigin];
-      const navOffset = (_this$$refs3 = this.$refs) === null || _this$$refs3 === void 0 ? void 0 : _this$$refs3.nav[offsetOrigin];
-      this.pagination.has = navItemsOfsset > navOffset;
+      const navItemsElement = (_this$$refs3 = this.$refs) === null || _this$$refs3 === void 0 ? void 0 : _this$$refs3.navItems;
+      const {
+        navItemsWidth
+      } = this.getElementRect({
+        el: navItemsElement,
+        prefix: "navItems"
+      });
+      const {
+        navWidth,
+        navHeight
+      } = this.getElementRect({
+        el: (_this$$refs4 = this.$refs) === null || _this$$refs4 === void 0 ? void 0 : _this$$refs4.nav,
+        prefix: "nav"
+      });
+      const navItemsHeight = [...(navItemsElement === null || navItemsElement === void 0 ? void 0 : navItemsElement.children)].slice(0, -1).map(el => el.offsetHeight).reduce((a, c) => a + c, 0);
 
-      if (this.pagination.has) {
-        let maxOffset = navItemsOfsset - navOffset; // Temporary solution to get height og nav items when vertical is set
+      const paginationFactory = (has, maxOffset, minOffset) => ({
+        has,
+        maxOffset,
+        minOffset,
+        offset: minOffset
+      });
 
-        if (offsetOrigin === "offsetHeight") {
-          var _this$$refs4;
-
-          const height = [...((_this$$refs4 = this.$refs) === null || _this$$refs4 === void 0 ? void 0 : _this$$refs4.navItems.children)].map(({
-            offsetHeight
-          }) => offsetHeight);
-          maxOffset = height.reduce((a, c) => a + c) - navOffset;
-        }
-
-        this.pagination.maxOffset = maxOffset;
-        this.pagination.offset = this.pagination.minOffset = navOffset;
-      }
+      Object.assign(this.pagination, {
+        portrait: paginationFactory(navItemsHeight > navHeight, navItemsHeight - navHeight, navHeight),
+        landscape: paginationFactory(navItemsWidth > navWidth, navItemsWidth - navWidth, navWidth)
+      }[this.orientation]);
     },
 
     paginationHandler(type) {
@@ -442,40 +451,66 @@ var script$2 = {
       }
     },
 
-    paginationBySomething({
+    async paginationByCollapse({
       model
     }) {
       var _this$$refs5, _this$$refs5$model, _this$$refs6;
 
-      const navActiveItemElement = (_this$$refs5 = this.$refs) === null || _this$$refs5 === void 0 ? void 0 : (_this$$refs5$model = _this$$refs5[model]) === null || _this$$refs5$model === void 0 ? void 0 : _this$$refs5$model[0];
-      const navElement = (_this$$refs6 = this.$refs) === null || _this$$refs6 === void 0 ? void 0 : _this$$refs6.nav;
+      await this.$nextTick();
+      const {
+        navActiveRight,
+        navActiveLeft,
+        navActiveTop,
+        navActiveBottom
+      } = this.getElementRect({
+        el: (_this$$refs5 = this.$refs) === null || _this$$refs5 === void 0 ? void 0 : (_this$$refs5$model = _this$$refs5[model]) === null || _this$$refs5$model === void 0 ? void 0 : _this$$refs5$model[0],
+        prefix: "navActive"
+      });
+      const {
+        navRight,
+        navLeft,
+        navTop,
+        navBottom
+      } = this.getElementRect({
+        el: (_this$$refs6 = this.$refs) === null || _this$$refs6 === void 0 ? void 0 : _this$$refs6.nav,
+        prefix: "nav"
+      });
+      let toTranslate = this.pagination.translate;
 
-      if (navActiveItemElement && navElement) {
-        let toTranslate = this.pagination.translate;
-        const {
-          right: navActiveRight,
-          left: navActiveLeft
-        } = navActiveItemElement.getBoundingClientRect();
-        const {
-          right: navRight,
-          left: navLeft
-        } = navElement.getBoundingClientRect();
-
+      if (this.orientation === "portrait") {
+        if (navActiveBottom > navBottom) {
+          toTranslate = toTranslate + (navActiveBottom - navBottom);
+        } else if (navActiveTop < navTop) {
+          toTranslate = toTranslate - (navTop - navActiveTop);
+        }
+      } else {
         if (navActiveRight > navRight) {
           toTranslate = toTranslate + (navActiveRight - navRight);
-        }
-
-        if (navActiveLeft < navLeft) {
+        } else if (navActiveLeft < navLeft) {
           toTranslate = toTranslate - (navLeft - navActiveLeft);
         }
-
-        this.pagination.translate = Math.floor(toTranslate);
       }
+
+      this.pagination.translate = toTranslate;
     },
 
     resizable() {
-      this.setPagination();
+      this.setPaginationOffset();
       this.sliderHandler();
+    },
+
+    getElementRect({
+      el,
+      prefix
+    }) {
+      if (!el) return;
+      const {
+        parse,
+        stringify
+      } = JSON;
+      const rect = Object.entries(parse(stringify(el.getBoundingClientRect())));
+      const newRect = rect.map(([i, k]) => [prefix + i.charAt(0).toUpperCase() + i.slice(1), k]);
+      return Object.fromEntries(newRect);
     }
 
   }
@@ -500,9 +535,9 @@ var __vue_render__$2 = function () {
       expression: "resizable"
     }],
     class: _vm.classes
-  }, [_vm.pagination.has ? _c('div', {
-    staticClass: "tab-pagination__prev"
-  }, [_c('Btn', {
+  }, [_c('div', {
+    staticClass: "tab__pagination__prev"
+  }, [_vm.pagination.has ? _c('Btn', {
     attrs: {
       "disabled": !_vm.paginateIndicator.previous
     },
@@ -511,7 +546,7 @@ var __vue_render__$2 = function () {
         return _vm.paginationHandler('previous');
       }
     }
-  })], 1) : _vm._e(), _vm._v(" "), _c('nav', {
+  }) : _vm._e()], 1), _vm._v(" "), _c('nav', {
     ref: "nav",
     staticClass: "tab__nav"
   }, [_c('ul', {
@@ -547,9 +582,9 @@ var __vue_render__$2 = function () {
     }) : _c('span', [_vm._v("\n          " + _vm._s(navItem.name) + "\n        ")])], 1);
   }), _vm._v(" "), _vm.navSlider ? _c('hr', {
     staticClass: "tab__slider"
-  }) : _vm._e()], 2)]), _vm._v(" "), _vm.pagination.has ? _c('div', {
-    staticClass: "tab-pagination__next"
-  }, [_c('Btn', {
+  }) : _vm._e()], 2)]), _vm._v(" "), _c('div', {
+    staticClass: "tab__pagination__next"
+  }, [_vm.pagination.has ? _c('Btn', {
     attrs: {
       "disabled": !_vm.paginateIndicator.next
     },
@@ -558,7 +593,7 @@ var __vue_render__$2 = function () {
         return _vm.paginationHandler('next');
       }
     }
-  })], 1) : _vm._e()]);
+  }) : _vm._e()], 1)]);
 };
 
 var __vue_staticRenderFns__$2 = [];
@@ -566,11 +601,11 @@ var __vue_staticRenderFns__$2 = [];
 
 const __vue_inject_styles__$2 = function (inject) {
   if (!inject) return;
-  inject("data-v-509891a2_0", {
-    source: ".tab__pagination[data-v-509891a2]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab-pagination__next[data-v-509891a2],.tab__pagination .tab-pagination__prev[data-v-509891a2]{flex:1 40px;min-width:40px}.tab-pagination__next[data-v-509891a2] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-509891a2]{position:relative;display:flex;overflow:hidden;margin:0 .3rem;flex:1 100%}.tab__nav__items[data-v-509891a2]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-509891a2]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-509891a2]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-509891a2]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-509891a2]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-509891a2]{background:#f3f2f2}.tab__slider[data-v-509891a2]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-509891a2]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-509891a2]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical[data-v-509891a2] .tab-pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-509891a2] .tab-pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-509891a2]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-509891a2]:hover{background:#2f3236}.tabs__nav--auto .tab__nav__item[data-v-509891a2]{flex:1 auto}",
+  inject("data-v-cc184518_0", {
+    source: ".tab__pagination[data-v-cc184518]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-cc184518],.tab__pagination__next[data-v-cc184518]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-cc184518] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-cc184518]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-cc184518]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-cc184518]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-cc184518]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-cc184518]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-cc184518]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-cc184518]{background:#f3f2f2}.tab__slider[data-v-cc184518]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-cc184518]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-cc184518]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-cc184518]{padding:0;margin:0}.tab__pagination--vertical[data-v-cc184518] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-cc184518] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-cc184518]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-cc184518]:hover{background:#2f3236}.tab__pagination--auto .tab__nav__item[data-v-cc184518]{flex:1 auto}",
     map: undefined,
     media: undefined
-  }), inject("data-v-509891a2_1", {
+  }), inject("data-v-cc184518_1", {
     source: ".ripple{background-color:#1866c04d;border-radius:50%;position:absolute;transform:scale(0);animation:ripple .6s linear;z-index:2}@keyframes ripple{to{transform:scale(4);opacity:0}}",
     map: undefined,
     media: undefined
@@ -579,7 +614,7 @@ const __vue_inject_styles__$2 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$2 = "data-v-509891a2";
+const __vue_scope_id__$2 = "data-v-cc184518";
 /* module identifier */
 
 const __vue_module_identifier__$2 = undefined;
@@ -793,8 +828,8 @@ var __vue_staticRenderFns__$1 = [];
 
 const __vue_inject_styles__$1 = function (inject) {
   if (!inject) return;
-  inject("data-v-07b6fa80_0", {
-    source: ".tabs[data-v-07b6fa80]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%}.tabs__content[data-v-07b6fa80]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;vertical-align:middle;height:100%;width:100%}.tabs--vertical[data-v-07b6fa80]{flex-direction:row}.tabs--dark[data-v-07b6fa80]{background:#222831}.tabs--dark .tab__nav__item[data-v-07b6fa80]{color:#f1f1f1}.tabs--dark .tab__nav__items .active[data-v-07b6fa80]{color:#fff}.tabs--dark .tab__nav__items .disabled[data-v-07b6fa80]{background:#2c2f35}.tabs--dark .tab__pagination[data-v-07b6fa80] .btn svg{fill:#d6d5d5}.tabs--dark .tab__pagination[data-v-07b6fa80] .btn:disabled svg{fill:#707279}",
+  inject("data-v-dee1394c_0", {
+    source: ".tabs[data-v-dee1394c]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%}.tabs__content[data-v-dee1394c]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-dee1394c]{flex-direction:row}.tabs--dark[data-v-dee1394c]{background:#222831}.tabs--dark .tabs__nav__item[data-v-dee1394c]{color:#f1f1f1}.tabs--dark .tabs__nav__items .active[data-v-dee1394c]{color:#fff}.tabs--dark .tabs__nav__items .disabled[data-v-dee1394c]{background:#2c2f35}.tabs--dark .tabs__nav[data-v-dee1394c] .btn svg{fill:#d6d5d5}.tabs--dark .tabs__nav[data-v-dee1394c] .btn:disabled svg{fill:#707279}",
     map: undefined,
     media: undefined
   });
@@ -802,7 +837,7 @@ const __vue_inject_styles__$1 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$1 = "data-v-07b6fa80";
+const __vue_scope_id__$1 = "data-v-dee1394c";
 /* module identifier */
 
 const __vue_module_identifier__$1 = undefined;

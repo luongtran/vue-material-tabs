@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="title">
-      <h1>vue-material-tabs <small>v0.0.1</small></h1>
+      <h1>vue-material-tabs <small>v0.0.4</small></h1>
       <a href="https://github.com/jairoblatt/vue-material-tabs" target="_blank">
         Docs
       </a>
@@ -144,7 +144,7 @@ body {
 
 .tab-wrapper {
   height: 610px;
-  width: 100%;
+  width: 900px;
   box-shadow: rgba(0, 0, 0, 0.096) 10px 10px 90px;
 }
 

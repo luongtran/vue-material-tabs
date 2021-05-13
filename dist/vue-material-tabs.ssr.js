@@ -352,8 +352,8 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
     Btn: __vue_component__$3,
     VNode: {
       functional: true,
-      render: function render(h, ctx) {
-        return h("span", [ctx.props.node]);
+      render: function render(_, ctx) {
+        return ctx.props.node;
       }
     }
   },
@@ -391,7 +391,7 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
       return {
         tab__pagination: true,
         "tab__pagination--vertical": this.vertical,
-        "tabs__nav--auto": this.navAuto && !this.vertical
+        "tab__pagination--auto": this.navAuto && !this.vertical
       };
     },
     styles: function styles() {
@@ -404,14 +404,18 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
         next: this.pagination.translate < this.pagination.maxOffset,
         previous: this.pagination.translate > 0
       };
+    },
+    orientation: function orientation() {
+      return this.vertical ? "portrait" : "landscape";
     }
   },
   watch: {
-    vertical: ["sliderHandler", "setPagination"],
-    tabItemActive: ["sliderHandler", "paginationBySomething"]
+    vertical: ["sliderHandler", "setPaginationOffset"],
+    tabItemActive: ["sliderHandler", "paginationByCollapse"]
   },
   mounted: function mounted() {
-    this.setPagination();
+    this.setPaginationOffset();
+    this.getElementRect(this.$refs.nav, "nav");
   },
   methods: {
     select: function select(navItem) {
@@ -420,16 +424,13 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
         byUser: true
       });
     },
-    testando: function testando() {
-      console.log("está fazendo o resize");
-    },
     sliderHandler: function sliderHandler() {
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var _this$$refs, _this$$refs$_this$tab, _this$$refs2;
+        var _this$$refs, _this$$refs2, _this$$refs2$_this$ta;
 
-        var navActiveItemElement, navItemsElement, _navActiveItemElement, width, height, navActiveLeft, navActiveTop, _navItemsElement$getB, navItemsLeft, navItemsTop, children, sliderElement;
+        var navItemsElement, _this$getElementRect, navItemsLeft, navItemsTop, _this$getElementRect2, navActiveWidth, navActiveHeight, navActiveLeft, navActiveTop, children, sliderEl;
 
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -439,28 +440,30 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
                 return _this.$nextTick();
 
               case 2:
-                navActiveItemElement = (_this$$refs = _this.$refs) === null || _this$$refs === void 0 ? void 0 : (_this$$refs$_this$tab = _this$$refs[_this.tabItemActive.model]) === null || _this$$refs$_this$tab === void 0 ? void 0 : _this$$refs$_this$tab[0];
-                navItemsElement = (_this$$refs2 = _this.$refs) === null || _this$$refs2 === void 0 ? void 0 : _this$$refs2.navItems;
+                navItemsElement = (_this$$refs = _this.$refs) === null || _this$$refs === void 0 ? void 0 : _this$$refs.navItems;
+                _this$getElementRect = _this.getElementRect({
+                  el: navItemsElement,
+                  prefix: "navItems"
+                }), navItemsLeft = _this$getElementRect.navItemsLeft, navItemsTop = _this$getElementRect.navItemsTop;
+                _this$getElementRect2 = _this.getElementRect({
+                  el: (_this$$refs2 = _this.$refs) === null || _this$$refs2 === void 0 ? void 0 : (_this$$refs2$_this$ta = _this$$refs2[_this.tabItemActive.model]) === null || _this$$refs2$_this$ta === void 0 ? void 0 : _this$$refs2$_this$ta[0],
+                  prefix: "navActive"
+                }), navActiveWidth = _this$getElementRect2.navActiveWidth, navActiveHeight = _this$getElementRect2.navActiveHeight, navActiveLeft = _this$getElementRect2.navActiveLeft, navActiveTop = _this$getElementRect2.navActiveTop;
+                children = navItemsElement.children;
+                sliderEl = children[children.length - 1];
+                sliderEl.removeAttribute("style");
+                Object.assign(sliderEl.style, {
+                  portrait: {
+                    height: "".concat(navActiveHeight, "px"),
+                    top: "".concat(navActiveTop - navItemsTop, "px")
+                  },
+                  landscape: {
+                    width: "".concat(navActiveWidth, "px"),
+                    left: "".concat(navActiveLeft - navItemsLeft, "px")
+                  }
+                }[_this.orientation]);
 
-                if (navActiveItemElement && navItemsElement) {
-                  _navActiveItemElement = navActiveItemElement.getBoundingClientRect(), width = _navActiveItemElement.width, height = _navActiveItemElement.height, navActiveLeft = _navActiveItemElement.left, navActiveTop = _navActiveItemElement.top;
-                  _navItemsElement$getB = navItemsElement.getBoundingClientRect(), navItemsLeft = _navItemsElement$getB.left, navItemsTop = _navItemsElement$getB.top;
-                  children = navItemsElement.children;
-                  sliderElement = children[children.length - 1];
-                  sliderElement.removeAttribute("style");
-                  Object.assign(sliderElement.style, {
-                    vertical: {
-                      height: "".concat(height, "px"),
-                      top: "".concat(navActiveTop - navItemsTop, "px")
-                    },
-                    horizontal: {
-                      width: "".concat(width, "px"),
-                      left: "".concat(navActiveLeft - navItemsLeft, "px")
-                    }
-                  }[_this.vertical ? "vertical" : "horizontal"]);
-                }
-
-              case 5:
+              case 9:
               case "end":
                 return _context.stop();
             }
@@ -468,13 +471,13 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
         }, _callee);
       }))();
     },
-    setPagination: function setPagination() {
+    setPaginationOffset: function setPaginationOffset() {
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-        var _this2$$refs;
+        var _this2$$refs, _this2$$refs2;
 
-        var offsetOrigin, navItemsOfsset, navOffset, maxOffset, _this2$$refs2, height;
+        var navItemsElement, _this2$getElementRect, navItemsWidth, _this2$getElementRect2, navWidth, navHeight, navItemsHeight, paginationFactory;
 
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -484,28 +487,34 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
                 return _this2.$nextTick();
 
               case 2:
-                _this2.pagination.translate = 0;
-                offsetOrigin = _this2.vertical ? "offsetHeight" : "offsetWidth";
-                navItemsOfsset = _this2.$refs.navItems[offsetOrigin];
-                navOffset = (_this2$$refs = _this2.$refs) === null || _this2$$refs === void 0 ? void 0 : _this2$$refs.nav[offsetOrigin];
-                _this2.pagination.has = navItemsOfsset > navOffset;
+                navItemsElement = (_this2$$refs = _this2.$refs) === null || _this2$$refs === void 0 ? void 0 : _this2$$refs.navItems;
+                _this2$getElementRect = _this2.getElementRect({
+                  el: navItemsElement,
+                  prefix: "navItems"
+                }), navItemsWidth = _this2$getElementRect.navItemsWidth;
+                _this2$getElementRect2 = _this2.getElementRect({
+                  el: (_this2$$refs2 = _this2.$refs) === null || _this2$$refs2 === void 0 ? void 0 : _this2$$refs2.nav,
+                  prefix: "nav"
+                }), navWidth = _this2$getElementRect2.navWidth, navHeight = _this2$getElementRect2.navHeight;
+                navItemsHeight = _toConsumableArray(navItemsElement === null || navItemsElement === void 0 ? void 0 : navItemsElement.children).slice(0, -1).map(function (el) {
+                  return el.offsetHeight;
+                }).reduce(function (a, c) {
+                  return a + c;
+                }, 0);
 
-                if (_this2.pagination.has) {
-                  maxOffset = navItemsOfsset - navOffset; // Temporary solution to get height og nav items when vertical is set
+                paginationFactory = function paginationFactory(has, maxOffset, minOffset) {
+                  return {
+                    has: has,
+                    maxOffset: maxOffset,
+                    minOffset: minOffset,
+                    offset: minOffset
+                  };
+                };
 
-                  if (offsetOrigin === "offsetHeight") {
-                    height = _toConsumableArray((_this2$$refs2 = _this2.$refs) === null || _this2$$refs2 === void 0 ? void 0 : _this2$$refs2.navItems.children).map(function (_ref) {
-                      var offsetHeight = _ref.offsetHeight;
-                      return offsetHeight;
-                    });
-                    maxOffset = height.reduce(function (a, c) {
-                      return a + c;
-                    }) - navOffset;
-                  }
-
-                  _this2.pagination.maxOffset = maxOffset;
-                  _this2.pagination.offset = _this2.pagination.minOffset = navOffset;
-                }
+                Object.assign(_this2.pagination, {
+                  portrait: paginationFactory(navItemsHeight > navHeight, navItemsHeight - navHeight, navHeight),
+                  landscape: paginationFactory(navItemsWidth > navWidth, navItemsWidth - navWidth, navWidth)
+                }[_this2.orientation]);
 
               case 8:
               case "end":
@@ -543,38 +552,76 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
         this.pagination.translate = translate + this.pagination.offset;
       }
     },
-    paginationBySomething: function paginationBySomething(_ref2) {
-      var _this$$refs3, _this$$refs3$model, _this$$refs4;
+    paginationByCollapse: function paginationByCollapse(_ref) {
+      var _this3 = this;
 
-      var model = _ref2.model;
-      var navActiveItemElement = (_this$$refs3 = this.$refs) === null || _this$$refs3 === void 0 ? void 0 : (_this$$refs3$model = _this$$refs3[model]) === null || _this$$refs3$model === void 0 ? void 0 : _this$$refs3$model[0];
-      var navElement = (_this$$refs4 = this.$refs) === null || _this$$refs4 === void 0 ? void 0 : _this$$refs4.nav;
+      return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+        var _this3$$refs, _this3$$refs$model, _this3$$refs2;
 
-      if (navActiveItemElement && navElement) {
-        var toTranslate = this.pagination.translate;
+        var model, _this3$getElementRect, navActiveRight, navActiveLeft, navActiveTop, navActiveBottom, _this3$getElementRect2, navRight, navLeft, navTop, navBottom, toTranslate;
 
-        var _navActiveItemElement2 = navActiveItemElement.getBoundingClientRect(),
-            navActiveRight = _navActiveItemElement2.right,
-            navActiveLeft = _navActiveItemElement2.left;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                model = _ref.model;
+                _context3.next = 3;
+                return _this3.$nextTick();
 
-        var _navElement$getBoundi = navElement.getBoundingClientRect(),
-            navRight = _navElement$getBoundi.right,
-            navLeft = _navElement$getBoundi.left;
+              case 3:
+                _this3$getElementRect = _this3.getElementRect({
+                  el: (_this3$$refs = _this3.$refs) === null || _this3$$refs === void 0 ? void 0 : (_this3$$refs$model = _this3$$refs[model]) === null || _this3$$refs$model === void 0 ? void 0 : _this3$$refs$model[0],
+                  prefix: "navActive"
+                }), navActiveRight = _this3$getElementRect.navActiveRight, navActiveLeft = _this3$getElementRect.navActiveLeft, navActiveTop = _this3$getElementRect.navActiveTop, navActiveBottom = _this3$getElementRect.navActiveBottom;
+                _this3$getElementRect2 = _this3.getElementRect({
+                  el: (_this3$$refs2 = _this3.$refs) === null || _this3$$refs2 === void 0 ? void 0 : _this3$$refs2.nav,
+                  prefix: "nav"
+                }), navRight = _this3$getElementRect2.navRight, navLeft = _this3$getElementRect2.navLeft, navTop = _this3$getElementRect2.navTop, navBottom = _this3$getElementRect2.navBottom;
+                toTranslate = _this3.pagination.translate;
 
-        if (navActiveRight > navRight) {
-          toTranslate = toTranslate + (navActiveRight - navRight);
-        }
+                if (_this3.orientation === "portrait") {
+                  if (navActiveBottom > navBottom) {
+                    toTranslate = toTranslate + (navActiveBottom - navBottom);
+                  } else if (navActiveTop < navTop) {
+                    toTranslate = toTranslate - (navTop - navActiveTop);
+                  }
+                } else {
+                  if (navActiveRight > navRight) {
+                    toTranslate = toTranslate + (navActiveRight - navRight);
+                  } else if (navActiveLeft < navLeft) {
+                    toTranslate = toTranslate - (navLeft - navActiveLeft);
+                  }
+                }
 
-        if (navActiveLeft < navLeft) {
-          toTranslate = toTranslate - (navLeft - navActiveLeft);
-        }
+                _this3.pagination.translate = toTranslate;
 
-        this.pagination.translate = Math.floor(toTranslate);
-      }
+              case 8:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }))();
     },
     resizable: function resizable() {
-      this.setPagination();
+      this.setPaginationOffset();
       this.sliderHandler();
+    },
+    getElementRect: function getElementRect(_ref2) {
+      var el = _ref2.el,
+          prefix = _ref2.prefix;
+      if (!el) return;
+      var parse = JSON.parse,
+          stringify = JSON.stringify;
+      var rect = Object.entries(parse(stringify(el.getBoundingClientRect())));
+      var newRect = rect.map(function (_ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+            i = _ref4[0],
+            k = _ref4[1];
+
+        return [prefix + i.charAt(0).toUpperCase() + i.slice(1), k];
+      });
+      return Object.fromEntries(newRect);
     }
   }
 };/* script */
@@ -596,7 +643,7 @@ var __vue_render__$2 = function __vue_render__() {
       expression: "resizable"
     }],
     class: _vm.classes
-  }, [_vm.pagination.has ? _vm._ssrNode("<div class=\"tab-pagination__prev\" data-v-509891a2>", "</div>", [_c('Btn', {
+  }, [_vm._ssrNode("<div class=\"tab__pagination__prev\" data-v-cc184518>", "</div>", [_vm.pagination.has ? _c('Btn', {
     attrs: {
       "disabled": !_vm.paginateIndicator.previous
     },
@@ -605,7 +652,7 @@ var __vue_render__$2 = function __vue_render__() {
         return _vm.paginationHandler('previous');
       }
     }
-  })], 1) : _vm._e(), _vm._ssrNode(" "), _vm._ssrNode("<nav class=\"tab__nav\" data-v-509891a2>", "</nav>", [_vm._ssrNode("<ul class=\"tab__nav__items\"" + _vm._ssrStyle(null, _vm.styles, null) + " data-v-509891a2>", "</ul>", [_vm._l(_vm.navItems, function (navItem, index) {
+  }) : _vm._e()], 1), _vm._ssrNode(" "), _vm._ssrNode("<nav class=\"tab__nav\" data-v-cc184518>", "</nav>", [_vm._ssrNode("<ul class=\"tab__nav__items\"" + _vm._ssrStyle(null, _vm.styles, null) + " data-v-cc184518>", "</ul>", [_vm._l(_vm.navItems, function (navItem, index) {
     return _c('li', {
       directives: [{
         name: "ripple",
@@ -632,7 +679,7 @@ var __vue_render__$2 = function __vue_render__() {
         "node": navItem.nameSlot
       }
     }) : _c('span', [_vm._v("\n          " + _vm._s(navItem.name) + "\n        ")])], 1);
-  }), _vm._ssrNode(" " + (_vm.navSlider ? "<hr class=\"tab__slider\" data-v-509891a2>" : "<!---->"))], 2)]), _vm._ssrNode(" "), _vm.pagination.has ? _vm._ssrNode("<div class=\"tab-pagination__next\" data-v-509891a2>", "</div>", [_c('Btn', {
+  }), _vm._ssrNode(" " + (_vm.navSlider ? "<hr class=\"tab__slider\" data-v-cc184518>" : "<!---->"))], 2)]), _vm._ssrNode(" "), _vm._ssrNode("<div class=\"tab__pagination__next\" data-v-cc184518>", "</div>", [_vm.pagination.has ? _c('Btn', {
     attrs: {
       "disabled": !_vm.paginateIndicator.next
     },
@@ -641,7 +688,7 @@ var __vue_render__$2 = function __vue_render__() {
         return _vm.paginationHandler('next');
       }
     }
-  })], 1) : _vm._e()], 2);
+  }) : _vm._e()], 1)], 2);
 };
 
 var __vue_staticRenderFns__$2 = [];
@@ -649,11 +696,11 @@ var __vue_staticRenderFns__$2 = [];
 
 var __vue_inject_styles__$2 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-509891a2_0", {
-    source: ".tab__pagination[data-v-509891a2]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab-pagination__next[data-v-509891a2],.tab__pagination .tab-pagination__prev[data-v-509891a2]{flex:1 40px;min-width:40px}.tab-pagination__next[data-v-509891a2] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-509891a2]{position:relative;display:flex;overflow:hidden;margin:0 .3rem;flex:1 100%}.tab__nav__items[data-v-509891a2]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-509891a2]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-509891a2]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-509891a2]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-509891a2]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-509891a2]{background:#f3f2f2}.tab__slider[data-v-509891a2]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-509891a2]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-509891a2]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical[data-v-509891a2] .tab-pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-509891a2] .tab-pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-509891a2]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-509891a2]:hover{background:#2f3236}.tabs__nav--auto .tab__nav__item[data-v-509891a2]{flex:1 auto}",
+  inject("data-v-cc184518_0", {
+    source: ".tab__pagination[data-v-cc184518]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-cc184518],.tab__pagination__next[data-v-cc184518]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-cc184518] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-cc184518]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-cc184518]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-cc184518]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-cc184518]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-cc184518]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-cc184518]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-cc184518]{background:#f3f2f2}.tab__slider[data-v-cc184518]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-cc184518]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-cc184518]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-cc184518]{padding:0;margin:0}.tab__pagination--vertical[data-v-cc184518] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-cc184518] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-cc184518]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-cc184518]:hover{background:#2f3236}.tab__pagination--auto .tab__nav__item[data-v-cc184518]{flex:1 auto}",
     map: undefined,
     media: undefined
-  }), inject("data-v-509891a2_1", {
+  }), inject("data-v-cc184518_1", {
     source: ".ripple{background-color:#1866c04d;border-radius:50%;position:absolute;transform:scale(0);animation:ripple .6s linear;z-index:2}@keyframes ripple{to{transform:scale(4);opacity:0}}",
     map: undefined,
     media: undefined
@@ -662,10 +709,10 @@ var __vue_inject_styles__$2 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$2 = "data-v-509891a2";
+var __vue_scope_id__$2 = "data-v-cc184518";
 /* module identifier */
 
-var __vue_module_identifier__$2 = "data-v-509891a2";
+var __vue_module_identifier__$2 = "data-v-cc184518";
 /* functional template */
 
 var __vue_is_functional_template__$2 = false;
@@ -851,7 +898,7 @@ var __vue_render__$1 = function __vue_render__() {
   }, false))], {
     "items": _vm.navItems,
     "active": _vm.tabItemActive
-  }), _vm._ssrNode(" "), _vm._ssrNode("<div class=\"tabs__content\" data-v-07b6fa80>", "</div>", [_vm._t("default")], 2)], 2);
+  }), _vm._ssrNode(" "), _vm._ssrNode("<div class=\"tabs__content\" data-v-dee1394c>", "</div>", [_vm._t("default")], 2)], 2);
 };
 
 var __vue_staticRenderFns__$1 = [];
@@ -859,8 +906,8 @@ var __vue_staticRenderFns__$1 = [];
 
 var __vue_inject_styles__$1 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-07b6fa80_0", {
-    source: ".tabs[data-v-07b6fa80]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%}.tabs__content[data-v-07b6fa80]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;vertical-align:middle;height:100%;width:100%}.tabs--vertical[data-v-07b6fa80]{flex-direction:row}.tabs--dark[data-v-07b6fa80]{background:#222831}.tabs--dark .tab__nav__item[data-v-07b6fa80]{color:#f1f1f1}.tabs--dark .tab__nav__items .active[data-v-07b6fa80]{color:#fff}.tabs--dark .tab__nav__items .disabled[data-v-07b6fa80]{background:#2c2f35}.tabs--dark .tab__pagination[data-v-07b6fa80] .btn svg{fill:#d6d5d5}.tabs--dark .tab__pagination[data-v-07b6fa80] .btn:disabled svg{fill:#707279}",
+  inject("data-v-dee1394c_0", {
+    source: ".tabs[data-v-dee1394c]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%}.tabs__content[data-v-dee1394c]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-dee1394c]{flex-direction:row}.tabs--dark[data-v-dee1394c]{background:#222831}.tabs--dark .tabs__nav__item[data-v-dee1394c]{color:#f1f1f1}.tabs--dark .tabs__nav__items .active[data-v-dee1394c]{color:#fff}.tabs--dark .tabs__nav__items .disabled[data-v-dee1394c]{background:#2c2f35}.tabs--dark .tabs__nav[data-v-dee1394c] .btn svg{fill:#d6d5d5}.tabs--dark .tabs__nav[data-v-dee1394c] .btn:disabled svg{fill:#707279}",
     map: undefined,
     media: undefined
   });
@@ -868,10 +915,10 @@ var __vue_inject_styles__$1 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$1 = "data-v-07b6fa80";
+var __vue_scope_id__$1 = "data-v-dee1394c";
 /* module identifier */
 
-var __vue_module_identifier__$1 = "data-v-07b6fa80";
+var __vue_module_identifier__$1 = "data-v-dee1394c";
 /* functional template */
 
 var __vue_is_functional_template__$1 = false;

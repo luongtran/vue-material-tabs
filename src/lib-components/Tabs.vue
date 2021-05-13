@@ -178,9 +178,9 @@ export default {
   overflow: hidden;
   justify-content: center;
   align-items: center;
-  vertical-align: middle;
   height: 100%;
   width: 100%;
+  flex: 1 100%;
 }
 
 .tabs--vertical {
@@ -191,23 +191,23 @@ export default {
   background: #222831;
 }
 
-.tabs--dark .tab__nav__item {
+.tabs--dark .tabs__nav__item {
   color: #f1f1f1;
 }
 
-.tabs--dark .tab__nav__items .active {
+.tabs--dark .tabs__nav__items .active {
   color: #fff;
 }
 
-.tabs--dark .tab__nav__items .disabled {
+.tabs--dark .tabs__nav__items .disabled {
   background: #2c2f35;
 }
 
-.tabs--dark .tab__pagination >>> .btn svg {
+.tabs--dark .tabs__nav >>> .btn svg {
   fill: rgb(214, 213, 213);
 }
 
-.tabs--dark .tab__pagination >>> .btn:disabled svg {
+.tabs--dark .tabs__nav >>> .btn:disabled svg {
   fill: #707279;
 }
 </style>

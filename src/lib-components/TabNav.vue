@@ -1,6 +1,6 @@
 <template>
   <div v-resize="resizable" :class="classes">
-    <div class="tab-pagination__prev">
+    <div class="tab__pagination__prev">
       <Btn
         v-if="pagination.has"
         :disabled="!paginateIndicator.previous"
@@ -29,7 +29,7 @@
         <hr v-if="navSlider" class="tab__slider" />
       </ul>
     </nav>
-    <div class="tab-pagination__next">
+    <div class="tab__pagination__next">
       <Btn
         v-if="pagination.has"
         :disabled="!paginateIndicator.next"
@@ -49,7 +49,7 @@ export default {
     Btn,
     VNode: {
       functional: true,
-      render: (h, ctx) => h("span", [ctx.props.node]),
+      render: (_, ctx) => ctx.props.node,
     },
   },
 
@@ -85,7 +85,7 @@ export default {
       return {
         tab__pagination: true,
         "tab__pagination--vertical": this.vertical,
-        "tabs__nav--auto": this.navAuto && !this.vertical,
+        "tab__pagination--auto": this.navAuto && !this.vertical,
       };
     },
 
@@ -168,8 +168,9 @@ export default {
     async setPaginationOffset() {
       await this.$nextTick();
 
-      const { navItemsWidth, navItemsHeight } = this.getElementRect({
-        el: this.$refs?.navItems,
+      const navItemsElement = this.$refs?.navItems;
+      const { navItemsWidth } = this.getElementRect({
+        el: navItemsElement,
         prefix: "navItems",
       });
 
@@ -177,6 +178,11 @@ export default {
         el: this.$refs?.nav,
         prefix: "nav",
       });
+
+      const navItemsHeight = [...navItemsElement?.children]
+        .slice(0, -1)
+        .map((el) => el.offsetHeight)
+        .reduce((a, c) => a + c, 0);
 
       const paginationFactory = (has, maxOffset, minOffset) => ({
         has,
@@ -228,25 +234,36 @@ export default {
     async paginationByCollapse({ model }) {
       await this.$nextTick();
 
-      const { navActiveRight, navActiveLeft } = this.getElementRect({
+      const {
+        navActiveRight,
+        navActiveLeft,
+        navActiveTop,
+        navActiveBottom,
+      } = this.getElementRect({
         el: this.$refs?.[model]?.[0],
         prefix: "navActive",
       });
 
-      const { navRight, navLeft } = this.getElementRect({
+      const { navRight, navLeft, navTop, navBottom } = this.getElementRect({
         el: this.$refs?.nav,
         prefix: "nav",
       });
 
       let toTranslate = this.pagination.translate;
-
-      if (navActiveRight > navRight) {
-        toTranslate = toTranslate + (navActiveRight - navRight);
+      if (this.orientation === "portrait") {
+        if (navActiveBottom > navBottom) {
+          toTranslate = toTranslate + (navActiveBottom - navBottom);
+        } else if (navActiveTop < navTop) {
+          toTranslate = toTranslate - (navTop - navActiveTop);
+        }
+      } else {
+        if (navActiveRight > navRight) {
+          toTranslate = toTranslate + (navActiveRight - navRight);
+        } else if (navActiveLeft < navLeft) {
+          toTranslate = toTranslate - (navLeft - navActiveLeft);
+        }
       }
-      if (navActiveLeft < navLeft) {
-        toTranslate = toTranslate - (navLeft - navActiveLeft);
-      }
-      this.pagination.translate = Math.floor(toTranslate);
+      this.pagination.translate = toTranslate;
     },
 
     resizable() {
@@ -281,13 +298,13 @@ export default {
   contain: content;
 }
 
-.tab__pagination .tab-pagination__prev,
-.tab-pagination__next {
+.tab__pagination .tab__pagination__prev,
+.tab__pagination__next {
   flex: 1 40px;
   min-width: 40px;
 }
 
-.tab-pagination__next >>> .btn svg {
+.tab__pagination__next >>> .btn svg {
   transform: rotate(180deg);
 }
 
@@ -371,11 +388,16 @@ export default {
   position: relative;
 }
 
-.tab__pagination--vertical >>> .tab-pagination__prev svg {
+.tab__pagination--vertical .tab__nav__item * {
+  padding: 0;
+  margin: 0;
+}
+
+.tab__pagination--vertical >>> .tab__pagination__prev svg {
   transform: rotate(90deg);
 }
 
-.tab__pagination--vertical >>> .tab-pagination__next svg {
+.tab__pagination--vertical >>> .tab__pagination__next svg {
   transform: rotate(270deg);
 }
 
@@ -390,7 +412,7 @@ export default {
 }
 
 /* Nav auto */
-.tabs__nav--auto .tab__nav__item {
+.tab__pagination--auto .tab__nav__item {
   flex: 1 auto;
 }
 </style>

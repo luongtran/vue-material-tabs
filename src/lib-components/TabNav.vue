@@ -113,7 +113,10 @@ export default {
 
   watch: {
     // Force recalc the pagination offsets when the orientation/navItems is change;
-    vertical: "resizable",
+    vertical() {
+      Object.assign(this.$data, this.$options.data());
+      this.resizable();
+    },
     navItems: "resizable",
   },
 

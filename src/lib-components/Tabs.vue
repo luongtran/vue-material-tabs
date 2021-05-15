@@ -203,11 +203,15 @@ export default {
   background: #2c2f35;
 }
 
-.tabs--dark .tabs__nav >>> .btn svg {
+.tabs--dark .tab__pagination >>> .btn svg {
   fill: rgb(214, 213, 213);
 }
 
-.tabs--dark .tabs__nav >>> .btn:disabled svg {
-  fill: #707279;
+.tabs--dark .tab__pagination >>> .btn:disabled svg {
+  fill: #56575c;
+}
+
+.tabs--dark .tab__pagination >>> .tab__nav__item:hover {
+  background: #424750;
 }
 </style>

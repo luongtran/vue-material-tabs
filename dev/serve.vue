@@ -70,7 +70,7 @@
         </TabItem>
 
         <TabItem
-          v-for="i in 10"
+          v-for="i in 15"
           :key="`tab-${i}`"
           :name="`tab ${i}`"
           :disabled="disabled && i === 2"
@@ -89,12 +89,11 @@
 
 <script>
 import Vue from "vue";
-import { Tabs, TabItem } from "@/entry.esm";
 import Btn from "./Btn";
 
 export default Vue.extend({
   name: "ServeDev",
-  components: { Tabs, TabItem, Btn },
+  components: { Btn },
 
   data: () => ({
     orientation: false,

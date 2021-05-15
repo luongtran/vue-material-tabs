@@ -7,9 +7,7 @@ exports[`TabNav.vue Should mount the component 1`] = `
   </div>
   <nav class=\\"tab__nav\\">
     <ul class=\\"tab__nav__items\\" style=\\"transform: translateX(-0px);\\">
-      <li class=\\"tab__nav__item active\\"><span>
-          Test
-        </span></li>
+      <li class=\\"tab__nav__item active\\"><span>Test</span></li>
       <!---->
     </ul>
   </nav>

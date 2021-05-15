@@ -31,6 +31,10 @@
       <Btn @click="disabled = !disabled">
         Disabled
       </Btn>
+
+      <Btn @click="add++">
+        Adicionar
+      </Btn>
     </div>
 
     <div class="tab-wrapper">
@@ -70,7 +74,7 @@
         </TabItem>
 
         <TabItem
-          v-for="i in 10"
+          v-for="i in add"
           :key="`tab-${i}`"
           :name="`tab ${i}`"
           :disabled="disabled && i === 2"
@@ -89,12 +93,11 @@
 
 <script>
 import Vue from "vue";
-import { Tabs, TabItem } from "@/entry.esm";
 import Btn from "./Btn";
 
 export default Vue.extend({
   name: "ServeDev",
-  components: { Tabs, TabItem, Btn },
+  components: { Btn },
 
   data: () => ({
     orientation: false,
@@ -103,6 +106,7 @@ export default Vue.extend({
     dark: false,
     slide: true,
     disabled: false,
+    add: 2,
   }),
 });
 </script>

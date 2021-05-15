@@ -1,10 +1,25 @@
 <template>
   <div id="app">
     <div class="title">
-      <h1>vue-material-tabs <small>v0.0.4</small></h1>
-      <a href="https://github.com/jairoblatt/vue-material-tabs" target="_blank">
-        Docs
-      </a>
+      <h1>vue-material-tabs</h1>
+
+      <a
+        class="github-button"
+        href="https://github.com/jairoblatt"
+        data-color-scheme="no-preference: light; light: light; dark: dark;"
+        data-size="large"
+        aria-label="Follow @jairoblatt on GitHub"
+        >Follow @jairoblatt</a
+      >
+      <a
+        class="github-button"
+        href="https://github.com/jairoblatt/vue-material-tabs"
+        data-color-scheme="no-preference: light; light: light; dark: dark;"
+        data-icon="octicon-star"
+        data-size="large"
+        aria-label="Star jairoblatt/vue-material-tabs on GitHub"
+        >Star</a
+      >
     </div>
 
     <div class="btn-group">
@@ -35,6 +50,9 @@
       <Btn @click="disabled = !disabled">
         Disabled
       </Btn>
+      <Btn @click="add++">
+        Add tab
+      </Btn>
     </div>
 
     <div class="tab-wrapper">
@@ -62,23 +80,8 @@
           </div>
         </TabItem>
 
-        <TabItem>
-          <template #name>
-            <span>
-              <span> 🚚</span>
-            </span>
-          </template>
-
-          <div class="tab-content">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Saepe
-            repellendus itaque in, dolore hic explicabo tenetur odit magnam
-            laborum vitae fugiat maiores eum consequuntur libero id. Repudiandae
-            quia et possimus?
-          </div>
-        </TabItem>
-
         <TabItem
-          v-for="i in 10"
+          v-for="i in add"
           :key="`tab-${i}`"
           :name="`tab ${i}`"
           :disabled="disabled && i === 2"
@@ -94,8 +97,12 @@
     </div>
   </div>
 </template>
-
 <script>
+// https://buttons.github.io/
+const script = document.createElement("script");
+script.setAttribute("src", "https://buttons.github.io/buttons.js");
+document.head.appendChild(script);
+
 import Vue from "vue";
 import { Tabs, TabItem } from "vue-material-tabs";
 import Btn from "./Btn";
@@ -112,6 +119,7 @@ export default Vue.extend({
     slide: true,
     disabled: false,
     slideVertical: false,
+    add: 9,
   }),
 });
 </script>
@@ -155,7 +163,7 @@ body {
 
 .tab-wrapper {
   height: 610px;
-  width: 900px;
+  width: 1000px;
 }
 
 .tab-content {
@@ -181,8 +189,8 @@ body {
   color: rgb(23, 29, 43);
 }
 
-.title a {
-  margin-left: 1rem;
+.title span {
+  padding-left: 20px;
 }
 
 @media only screen and (max-width: 1000px) {
@@ -190,6 +198,10 @@ body {
     max-width: 97.333%;
   }
 
+  .tab-wrapper {
+    height: 50%;
+    width: 97%;
+  }
   .btn-group {
     width: 100%;
   }

@@ -69,7 +69,7 @@ describe("TabNav.vue", () => {
     });
 
     expect(wrapper.vm.paginateIndicator.next).toBe(true);
-    expect(wrapper.vm.paginateIndicator.previous).toBe(true);
+    expect(wrapper.vm.paginateIndicator.prev).toBe(true);
   });
 
   it("Should have 'portrait' when vertical is set to true", async () => {

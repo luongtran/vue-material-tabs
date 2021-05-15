@@ -1,8 +1,8 @@
 import Vue from "vue";
 import Dev from "./serve.vue";
-// import VueMaterialTabs from "@/entry.esm";
+import VueMaterialTabs from "@/entry.esm";
 
-// Vue.use(VueMaterialTabs);
+Vue.use(VueMaterialTabs);
 
 Vue.config.productionTip = false;
 

@@ -3,14 +3,14 @@
     <div class="tab__pagination__prev">
       <Btn
         v-if="pagination.has"
-        :disabled="!paginateIndicator.previous"
-        @click="paginationHandler('previous')"
+        :disabled="!paginateIndicator.prev"
+        @click="paginationHandler('prev')"
       />
     </div>
     <nav ref="nav" class="tab__nav">
       <ul ref="navItems" class="tab__nav__items" :style="styles">
         <li
-          v-ripple="ripple"
+          v-ripple="ripple && !navItem.disabled"
           v-for="(navItem, index) in navItems"
           :key="`tab-item-${index}`"
           :ref="navItem.model"
@@ -21,10 +21,7 @@
           }"
           @click.prevent="select(navItem)"
         >
-          <VNode v-if="navItem.nameSlot" :node="navItem.nameSlot" />
-          <span v-else>
-            {{ navItem.name }}
-          </span>
+          <VNode :node="navItem.nameSlot" :name="navItem.name" />
         </li>
         <hr v-if="navSlider" class="tab__slider" />
       </ul>
@@ -49,11 +46,16 @@ export default {
     Btn,
     VNode: {
       functional: true,
-      render: (_, ctx) => ctx.props.node,
+      render: (h, ctx) => {
+        return ctx.props.node ? ctx.props.node : h("span", ctx.props.name);
+      },
     },
   },
 
-  directives: { ripple, resize },
+  directives: {
+    ripple,
+    resize,
+  },
 
   props: {
     vertical: Boolean,
@@ -100,7 +102,7 @@ export default {
     paginateIndicator() {
       return {
         next: this.pagination.translate < this.pagination.maxOffset,
-        previous: this.pagination.translate > 0,
+        prev: this.pagination.translate > 0,
       };
     },
 
@@ -110,13 +112,12 @@ export default {
   },
 
   watch: {
-    vertical: ["sliderHandler", "setPaginationOffset"],
-    tabItemActive: ["sliderHandler", "paginationByCollapse"],
-  },
-
-  mounted() {
-    this.setPaginationOffset();
-    this.getElementRect(this.$refs.nav, "nav");
+    // Force recalc the pagination offsets when the orientation/navItems is change;
+    vertical() {
+      Object.assign(this.$data, this.$options.data());
+      this.resizable();
+    },
+    navItems: "resizable",
   },
 
   methods: {
@@ -125,11 +126,13 @@ export default {
         tabItem: navItem,
         byUser: true,
       });
+      this.sliderHandler(navItem?.model);
+      if (this.pagination.has) {
+        this.paginationCollapse(navItem);
+      }
     },
 
-    async sliderHandler() {
-      await this.$nextTick();
-
+    sliderHandler(model) {
       const navItemsElement = this.$refs?.navItems;
       const { navItemsLeft, navItemsTop } = this.getElementRect({
         el: navItemsElement,
@@ -142,7 +145,7 @@ export default {
         navActiveLeft,
         navActiveTop,
       } = this.getElementRect({
-        el: this.$refs?.[this.tabItemActive.model]?.[0],
+        el: this.$refs?.[model || this.tabItemActive.model]?.[0],
         prefix: "navActive",
       });
 
@@ -165,9 +168,7 @@ export default {
       );
     },
 
-    async setPaginationOffset() {
-      await this.$nextTick();
-
+    getPagination() {
       const navItemsElement = this.$refs?.navItems;
       const { navItemsWidth } = this.getElementRect({
         el: navItemsElement,
@@ -182,14 +183,17 @@ export default {
       const navItemsHeight = [...navItemsElement?.children]
         .slice(0, -1)
         .map((el) => el.offsetHeight)
-        .reduce((a, c) => a + c, 0);
+        .reduce((a, c) => Math.abs(a + c), 0);
 
-      const paginationFactory = (has, maxOffset, minOffset) => ({
-        has,
-        maxOffset,
-        minOffset,
-        offset: minOffset,
-      });
+      const paginationFactory = (has, maxOffset, minOffset) => {
+        const paginationOffsets = Object.entries({
+          has,
+          maxOffset,
+          minOffset,
+          offset: minOffset,
+        }).map(([k, v]) => [k, Math.abs(v)]);
+        return Object.fromEntries(paginationOffsets);
+      };
 
       Object.assign(
         this.pagination,
@@ -210,7 +214,7 @@ export default {
 
     paginationHandler(type) {
       const { maxOffset, offset, translate, minOffset } = this.pagination;
-      if (type === "previous" && this.paginateIndicator.previous) {
+      if (type === "prev" && this.paginateIndicator.prev) {
         if (offset <= minOffset) {
           this.pagination.offset = minOffset;
         }
@@ -231,44 +235,58 @@ export default {
       }
     },
 
-    async paginationByCollapse({ model }) {
-      await this.$nextTick();
-
+    paginationCollapse({ model }) {
       const {
         navActiveRight,
         navActiveLeft,
         navActiveTop,
         navActiveBottom,
+        navActiveWidth,
+        navActiveHeight,
       } = this.getElementRect({
         el: this.$refs?.[model]?.[0],
         prefix: "navActive",
       });
-
       const { navRight, navLeft, navTop, navBottom } = this.getElementRect({
         el: this.$refs?.nav,
         prefix: "nav",
       });
 
-      let toTranslate = this.pagination.translate;
-      if (this.orientation === "portrait") {
-        if (navActiveBottom > navBottom) {
-          toTranslate = toTranslate + (navActiveBottom - navBottom);
-        } else if (navActiveTop < navTop) {
-          toTranslate = toTranslate - (navTop - navActiveTop);
-        }
-      } else {
-        if (navActiveRight > navRight) {
-          toTranslate = toTranslate + (navActiveRight - navRight);
-        } else if (navActiveLeft < navLeft) {
-          toTranslate = toTranslate - (navLeft - navActiveLeft);
-        }
+      const { translate, maxOffset } = this.pagination;
+      let toTranslate = translate;
+
+      // Portrait
+      if (this.vertical && navActiveBottom > navBottom) {
+        toTranslate = toTranslate + navActiveHeight;
       }
-      this.pagination.translate = toTranslate;
+
+      if (this.vertical && navActiveTop < navTop) {
+        toTranslate =
+          navActiveHeight > toTranslate ? 0 : toTranslate - navActiveHeight;
+      }
+
+      // Landscape
+      if (!this.vertical && navActiveRight > navRight) {
+        toTranslate = toTranslate + navActiveWidth;
+      }
+
+      if (!this.vertical && navActiveLeft < navLeft) {
+        toTranslate =
+          navActiveWidth > toTranslate ? 0 : toTranslate - navActiveWidth;
+      }
+
+      if (toTranslate > maxOffset) {
+        toTranslate = toTranslate + (maxOffset - toTranslate);
+      }
+
+      this.pagination.translate = Math.abs(toTranslate);
     },
 
     resizable() {
-      this.setPaginationOffset();
-      this.sliderHandler();
+      this.$nextTick(() => {
+        this.getPagination();
+        this.sliderHandler();
+      });
     },
 
     getElementRect({ el, prefix }) {
@@ -279,7 +297,6 @@ export default {
         prefix + i.charAt(0).toUpperCase() + i.slice(1),
         k,
       ]);
-
       return Object.fromEntries(newRect);
     },
   },
@@ -429,7 +446,7 @@ export default {
 
 @keyframes ripple {
   to {
-    transform: scale(4);
+    transform: scale(2.5);
     opacity: 0;
   }
 }

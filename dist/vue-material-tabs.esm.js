@@ -275,7 +275,9 @@ var script$2 = {
     Btn: __vue_component__$3,
     VNode: {
       functional: true,
-      render: (_, ctx) => ctx.props.node
+      render: (h, ctx) => {
+        return ctx.props.node ? ctx.props.node : h("span", ctx.props.name);
+      }
     }
   },
   directives: {
@@ -323,7 +325,7 @@ var script$2 = {
     paginateIndicator() {
       return {
         next: this.pagination.translate < this.pagination.maxOffset,
-        previous: this.pagination.translate > 0
+        prev: this.pagination.translate > 0
       };
     },
 
@@ -333,27 +335,30 @@ var script$2 = {
 
   },
   watch: {
-    vertical: ["sliderHandler", "setPaginationOffset"],
-    tabItemActive: ["sliderHandler", "paginationByCollapse"]
-  },
+    // Force recalc the pagination offsets when the orientation/navItems is change;
+    vertical() {
+      Object.assign(this.$data, this.$options.data());
+      this.resizable();
+    },
 
-  mounted() {
-    this.setPaginationOffset();
-    this.getElementRect(this.$refs.nav, "nav");
+    navItems: "resizable"
   },
-
   methods: {
     select(navItem) {
       this.$emit("select", {
         tabItem: navItem,
         byUser: true
       });
+      this.sliderHandler(navItem === null || navItem === void 0 ? void 0 : navItem.model);
+
+      if (this.pagination.has) {
+        this.paginationCollapse(navItem);
+      }
     },
 
-    async sliderHandler() {
-      var _this$$refs, _this$$refs2, _this$$refs2$this$tab;
+    sliderHandler(model) {
+      var _this$$refs, _this$$refs2, _this$$refs3;
 
-      await this.$nextTick();
       const navItemsElement = (_this$$refs = this.$refs) === null || _this$$refs === void 0 ? void 0 : _this$$refs.navItems;
       const {
         navItemsLeft,
@@ -368,7 +373,7 @@ var script$2 = {
         navActiveLeft,
         navActiveTop
       } = this.getElementRect({
-        el: (_this$$refs2 = this.$refs) === null || _this$$refs2 === void 0 ? void 0 : (_this$$refs2$this$tab = _this$$refs2[this.tabItemActive.model]) === null || _this$$refs2$this$tab === void 0 ? void 0 : _this$$refs2$this$tab[0],
+        el: (_this$$refs2 = this.$refs) === null || _this$$refs2 === void 0 ? void 0 : (_this$$refs3 = _this$$refs2[model || this.tabItemActive.model]) === null || _this$$refs3 === void 0 ? void 0 : _this$$refs3[0],
         prefix: "navActive"
       });
       const {
@@ -388,11 +393,10 @@ var script$2 = {
       }[this.orientation]);
     },
 
-    async setPaginationOffset() {
-      var _this$$refs3, _this$$refs4;
+    getPagination() {
+      var _this$$refs4, _this$$refs5;
 
-      await this.$nextTick();
-      const navItemsElement = (_this$$refs3 = this.$refs) === null || _this$$refs3 === void 0 ? void 0 : _this$$refs3.navItems;
+      const navItemsElement = (_this$$refs4 = this.$refs) === null || _this$$refs4 === void 0 ? void 0 : _this$$refs4.navItems;
       const {
         navItemsWidth
       } = this.getElementRect({
@@ -403,17 +407,20 @@ var script$2 = {
         navWidth,
         navHeight
       } = this.getElementRect({
-        el: (_this$$refs4 = this.$refs) === null || _this$$refs4 === void 0 ? void 0 : _this$$refs4.nav,
+        el: (_this$$refs5 = this.$refs) === null || _this$$refs5 === void 0 ? void 0 : _this$$refs5.nav,
         prefix: "nav"
       });
-      const navItemsHeight = [...(navItemsElement === null || navItemsElement === void 0 ? void 0 : navItemsElement.children)].slice(0, -1).map(el => el.offsetHeight).reduce((a, c) => a + c, 0);
+      const navItemsHeight = [...(navItemsElement === null || navItemsElement === void 0 ? void 0 : navItemsElement.children)].slice(0, -1).map(el => el.offsetHeight).reduce((a, c) => Math.abs(a + c), 0);
 
-      const paginationFactory = (has, maxOffset, minOffset) => ({
-        has,
-        maxOffset,
-        minOffset,
-        offset: minOffset
-      });
+      const paginationFactory = (has, maxOffset, minOffset) => {
+        const paginationOffsets = Object.entries({
+          has,
+          maxOffset,
+          minOffset,
+          offset: minOffset
+        }).map(([k, v]) => [k, Math.abs(v)]);
+        return Object.fromEntries(paginationOffsets);
+      };
 
       Object.assign(this.pagination, {
         portrait: paginationFactory(navItemsHeight > navHeight, navItemsHeight - navHeight, navHeight),
@@ -429,7 +436,7 @@ var script$2 = {
         minOffset
       } = this.pagination;
 
-      if (type === "previous" && this.paginateIndicator.previous) {
+      if (type === "prev" && this.paginateIndicator.prev) {
         if (offset <= minOffset) {
           this.pagination.offset = minOffset;
         }
@@ -451,19 +458,20 @@ var script$2 = {
       }
     },
 
-    async paginationByCollapse({
+    paginationCollapse({
       model
     }) {
-      var _this$$refs5, _this$$refs5$model, _this$$refs6;
+      var _this$$refs6, _this$$refs6$model, _this$$refs7;
 
-      await this.$nextTick();
       const {
         navActiveRight,
         navActiveLeft,
         navActiveTop,
-        navActiveBottom
+        navActiveBottom,
+        navActiveWidth,
+        navActiveHeight
       } = this.getElementRect({
-        el: (_this$$refs5 = this.$refs) === null || _this$$refs5 === void 0 ? void 0 : (_this$$refs5$model = _this$$refs5[model]) === null || _this$$refs5$model === void 0 ? void 0 : _this$$refs5$model[0],
+        el: (_this$$refs6 = this.$refs) === null || _this$$refs6 === void 0 ? void 0 : (_this$$refs6$model = _this$$refs6[model]) === null || _this$$refs6$model === void 0 ? void 0 : _this$$refs6$model[0],
         prefix: "navActive"
       });
       const {
@@ -472,31 +480,44 @@ var script$2 = {
         navTop,
         navBottom
       } = this.getElementRect({
-        el: (_this$$refs6 = this.$refs) === null || _this$$refs6 === void 0 ? void 0 : _this$$refs6.nav,
+        el: (_this$$refs7 = this.$refs) === null || _this$$refs7 === void 0 ? void 0 : _this$$refs7.nav,
         prefix: "nav"
       });
-      let toTranslate = this.pagination.translate;
+      const {
+        translate,
+        maxOffset
+      } = this.pagination;
+      let toTranslate = translate; // Portrait
 
-      if (this.orientation === "portrait") {
-        if (navActiveBottom > navBottom) {
-          toTranslate = toTranslate + (navActiveBottom - navBottom);
-        } else if (navActiveTop < navTop) {
-          toTranslate = toTranslate - (navTop - navActiveTop);
-        }
-      } else {
-        if (navActiveRight > navRight) {
-          toTranslate = toTranslate + (navActiveRight - navRight);
-        } else if (navActiveLeft < navLeft) {
-          toTranslate = toTranslate - (navLeft - navActiveLeft);
-        }
+      if (this.vertical && navActiveBottom > navBottom) {
+        toTranslate = toTranslate + navActiveHeight;
       }
 
-      this.pagination.translate = toTranslate;
+      if (this.vertical && navActiveTop < navTop) {
+        toTranslate = navActiveHeight > toTranslate ? 0 : toTranslate - navActiveHeight;
+      } // Landscape
+
+
+      if (!this.vertical && navActiveRight > navRight) {
+        toTranslate = toTranslate + navActiveWidth;
+      }
+
+      if (!this.vertical && navActiveLeft < navLeft) {
+        toTranslate = navActiveWidth > toTranslate ? 0 : toTranslate - navActiveWidth;
+      }
+
+      if (toTranslate > maxOffset) {
+        toTranslate = toTranslate + (maxOffset - toTranslate);
+      }
+
+      this.pagination.translate = Math.abs(toTranslate);
     },
 
     resizable() {
-      this.setPaginationOffset();
-      this.sliderHandler();
+      this.$nextTick(() => {
+        this.getPagination();
+        this.sliderHandler();
+      });
     },
 
     getElementRect({
@@ -539,11 +560,11 @@ var __vue_render__$2 = function () {
     staticClass: "tab__pagination__prev"
   }, [_vm.pagination.has ? _c('Btn', {
     attrs: {
-      "disabled": !_vm.paginateIndicator.previous
+      "disabled": !_vm.paginateIndicator.prev
     },
     on: {
       "click": function ($event) {
-        return _vm.paginationHandler('previous');
+        return _vm.paginationHandler('prev');
       }
     }
   }) : _vm._e()], 1), _vm._v(" "), _c('nav', {
@@ -558,8 +579,8 @@ var __vue_render__$2 = function () {
       directives: [{
         name: "ripple",
         rawName: "v-ripple",
-        value: _vm.ripple,
-        expression: "ripple"
+        value: _vm.ripple && !navItem.disabled,
+        expression: "ripple && !navItem.disabled"
       }],
       key: "tab-item-" + index,
       ref: navItem.model,
@@ -575,11 +596,12 @@ var __vue_render__$2 = function () {
           return _vm.select(navItem);
         }
       }
-    }, [navItem.nameSlot ? _c('VNode', {
+    }, [_c('VNode', {
       attrs: {
-        "node": navItem.nameSlot
+        "node": navItem.nameSlot,
+        "name": navItem.name
       }
-    }) : _c('span', [_vm._v("\n          " + _vm._s(navItem.name) + "\n        ")])], 1);
+    })], 1);
   }), _vm._v(" "), _vm.navSlider ? _c('hr', {
     staticClass: "tab__slider"
   }) : _vm._e()], 2)]), _vm._v(" "), _c('div', {
@@ -601,12 +623,12 @@ var __vue_staticRenderFns__$2 = [];
 
 const __vue_inject_styles__$2 = function (inject) {
   if (!inject) return;
-  inject("data-v-cc184518_0", {
-    source: ".tab__pagination[data-v-cc184518]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-cc184518],.tab__pagination__next[data-v-cc184518]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-cc184518] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-cc184518]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-cc184518]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-cc184518]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-cc184518]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-cc184518]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-cc184518]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-cc184518]{background:#f3f2f2}.tab__slider[data-v-cc184518]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-cc184518]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-cc184518]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-cc184518]{padding:0;margin:0}.tab__pagination--vertical[data-v-cc184518] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-cc184518] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-cc184518]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-cc184518]:hover{background:#2f3236}.tab__pagination--auto .tab__nav__item[data-v-cc184518]{flex:1 auto}",
+  inject("data-v-2de04152_0", {
+    source: ".tab__pagination[data-v-2de04152]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-2de04152],.tab__pagination__next[data-v-2de04152]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-2de04152] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-2de04152]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-2de04152]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-2de04152]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-2de04152]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-2de04152]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-2de04152]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-2de04152]{background:#f3f2f2}.tab__slider[data-v-2de04152]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-2de04152]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-2de04152]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-2de04152]{padding:0;margin:0}.tab__pagination--vertical[data-v-2de04152] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-2de04152] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-2de04152]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-2de04152]:hover{background:#2f3236}.tab__pagination--auto .tab__nav__item[data-v-2de04152]{flex:1 auto}",
     map: undefined,
     media: undefined
-  }), inject("data-v-cc184518_1", {
-    source: ".ripple{background-color:#1866c04d;border-radius:50%;position:absolute;transform:scale(0);animation:ripple .6s linear;z-index:2}@keyframes ripple{to{transform:scale(4);opacity:0}}",
+  }), inject("data-v-2de04152_1", {
+    source: ".ripple{background-color:#1866c04d;border-radius:50%;position:absolute;transform:scale(0);animation:ripple .6s linear;z-index:2}@keyframes ripple{to{transform:scale(2.5);opacity:0}}",
     map: undefined,
     media: undefined
   });
@@ -614,7 +636,7 @@ const __vue_inject_styles__$2 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$2 = "data-v-cc184518";
+const __vue_scope_id__$2 = "data-v-2de04152";
 /* module identifier */
 
 const __vue_module_identifier__$2 = undefined;
@@ -670,20 +692,10 @@ var script$1 = {
       current: 0,
       last: 0,
       previous: 0
-    }
+    },
+    tabItems: []
   }),
   computed: {
-    tabItems() {
-      var _this$$slots;
-
-      return (_this$$slots = this.$slots) === null || _this$$slots === void 0 ? void 0 : _this$$slots.default.map(({
-        componentInstance,
-        componentOptions
-      }) => {
-        if ((componentOptions === null || componentOptions === void 0 ? void 0 : componentOptions.tag) === "TabItem") return componentInstance;
-      }).filter(el => el);
-    },
-
     classes() {
       return {
         tabs: true,
@@ -717,7 +729,6 @@ var script$1 = {
   },
 
   mounted() {
-    this.setNavItems();
     this.activeTabItem({
       tabItem: this.navItems[0],
       byUser: false
@@ -725,29 +736,28 @@ var script$1 = {
   },
 
   methods: {
-    setNavItems() {
-      var _this$tabItems;
+    setTabItem(tabItemInstance) {
+      var _tabItemInstance$$opt;
 
-      const navItems = (_this$tabItems = this.tabItems) === null || _this$tabItems === void 0 ? void 0 : _this$tabItems.map(({
+      if ((tabItemInstance === null || tabItemInstance === void 0 ? void 0 : (_tabItemInstance$$opt = tabItemInstance.$options) === null || _tabItemInstance$$opt === void 0 ? void 0 : _tabItemInstance$$opt._componentTag) === "TabItem") {
+        this.tabItems.push(tabItemInstance);
+        this.setNavItem(tabItemInstance);
+      }
+    },
+
+    setNavItem({
+      model,
+      name,
+      disabled,
+      nameSlot
+    }) {
+      this.navItems.push({
         model,
         name,
         disabled,
-        $slots
-      }) => {
-        var _$slots$name;
-
-        return {
-          model,
-          name,
-          disabled,
-          nameSlot: $slots === null || $slots === void 0 ? void 0 : (_$slots$name = $slots.name) === null || _$slots$name === void 0 ? void 0 : _$slots$name[0]
-        };
+        nameSlot
       });
-
-      if (navItems !== null && navItems !== void 0 && navItems.length) {
-        this.navItems = navItems;
-        this.tabItemIndexes.last = navItems.length - 1;
-      }
+      this.tabItemIndexes.last = this.navItems.length - 1;
     },
 
     activeTabItem({
@@ -828,8 +838,8 @@ var __vue_staticRenderFns__$1 = [];
 
 const __vue_inject_styles__$1 = function (inject) {
   if (!inject) return;
-  inject("data-v-dee1394c_0", {
-    source: ".tabs[data-v-dee1394c]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%}.tabs__content[data-v-dee1394c]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-dee1394c]{flex-direction:row}.tabs--dark[data-v-dee1394c]{background:#222831}.tabs--dark .tabs__nav__item[data-v-dee1394c]{color:#f1f1f1}.tabs--dark .tabs__nav__items .active[data-v-dee1394c]{color:#fff}.tabs--dark .tabs__nav__items .disabled[data-v-dee1394c]{background:#2c2f35}.tabs--dark .tabs__nav[data-v-dee1394c] .btn svg{fill:#d6d5d5}.tabs--dark .tabs__nav[data-v-dee1394c] .btn:disabled svg{fill:#707279}",
+  inject("data-v-281cca8c_0", {
+    source: ".tabs[data-v-281cca8c]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%}.tabs__content[data-v-281cca8c]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-281cca8c]{flex-direction:row}.tabs--dark[data-v-281cca8c]{background:#222831}.tabs--dark .tabs__nav__item[data-v-281cca8c]{color:#f1f1f1}.tabs--dark .tabs__nav__items .active[data-v-281cca8c]{color:#fff}.tabs--dark .tabs__nav__items .disabled[data-v-281cca8c]{background:#2c2f35}.tabs--dark .tab__pagination[data-v-281cca8c] .btn svg{fill:#d6d5d5}.tabs--dark .tab__pagination[data-v-281cca8c] .btn:disabled svg{fill:#56575c}.tabs--dark .tab__pagination[data-v-281cca8c] .tab__nav__item:hover{background:#424750}",
     map: undefined,
     media: undefined
   });
@@ -837,7 +847,7 @@ const __vue_inject_styles__$1 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$1 = "data-v-dee1394c";
+const __vue_scope_id__$1 = "data-v-281cca8c";
 /* module identifier */
 
 const __vue_module_identifier__$1 = undefined;
@@ -865,6 +875,8 @@ const __vue_component__$1 = /*#__PURE__*/normalizeComponent({
 //
 //
 //
+const crypto = require("crypto");
+
 var script = {
   name: "TabItem",
   props: {
@@ -876,11 +888,11 @@ var script = {
   },
   data: () => ({
     activeModel: "",
-    model: ""
+    model: crypto.randomBytes(10).toString("hex")
   }),
 
   created() {
-    this.model = Math.random().toString(36).substring(2);
+    this.tabs.setTabItem(this);
   },
 
   computed: {
@@ -962,8 +974,8 @@ var __vue_staticRenderFns__ = [];
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-15af76e8_0", {
-    source: ".tab-item[data-v-15af76e8]{position:absolute;top:0;left:0;z-index:1;height:100%;width:100%;transition:transform cubic-bezier(.25,.8,.5,1)}.slide-left-enter[data-v-15af76e8],.slide-right-leave-to[data-v-15af76e8]{transform:translateX(-100%)}.slide-left-leave-to[data-v-15af76e8],.slide-right-enter[data-v-15af76e8]{transform:translateX(100%)}.slide-bottom-leave-to[data-v-15af76e8],.slide-top-enter[data-v-15af76e8]{transform:translateY(-100%)}.slide-bottom-enter[data-v-15af76e8],.slide-top-leave-to[data-v-15af76e8]{transform:translateY(100%)}",
+  inject("data-v-a315dbc4_0", {
+    source: ".tab-item[data-v-a315dbc4]{position:absolute;top:0;left:0;z-index:1;height:100%;width:100%;transition:transform cubic-bezier(.25,.8,.5,1)}.slide-left-enter[data-v-a315dbc4],.slide-right-leave-to[data-v-a315dbc4]{transform:translateX(-100%)}.slide-left-leave-to[data-v-a315dbc4],.slide-right-enter[data-v-a315dbc4]{transform:translateX(100%)}.slide-bottom-leave-to[data-v-a315dbc4],.slide-top-enter[data-v-a315dbc4]{transform:translateY(-100%)}.slide-bottom-enter[data-v-a315dbc4],.slide-top-leave-to[data-v-a315dbc4]{transform:translateY(100%)}",
     map: undefined,
     media: undefined
   });
@@ -971,7 +983,7 @@ const __vue_inject_styles__ = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__ = "data-v-15af76e8";
+const __vue_scope_id__ = "data-v-a315dbc4";
 /* module identifier */
 
 const __vue_module_identifier__ = undefined;

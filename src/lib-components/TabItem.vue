@@ -15,6 +15,7 @@ const crypto = require("crypto");
 
 export default {
   name: "TabItem",
+
   props: {
     name: {
       type: String,
@@ -28,6 +29,10 @@ export default {
     activeModel: "",
     model: crypto.randomBytes(10).toString("hex"),
   }),
+
+  created() {
+    this.tabs.setTabItem(this);
+  },
 
   computed: {
     tabs() {

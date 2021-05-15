@@ -47,8 +47,7 @@ export default {
     VNode: {
       functional: true,
       render: (h, ctx) => {
-        if (!ctx.props.node) return h("span", ctx.props.name);
-        return ctx.props.node;
+        return ctx.props.node ? ctx.props.node : h("span", ctx.props.name);
       },
     },
   },
@@ -113,27 +112,24 @@ export default {
   },
 
   watch: {
-    vertical: ["sliderHandler", "setPaginationOffset"],
-    tabItemActive: "sliderHandler",
-  },
-
-  mounted() {
-    this.setPaginationOffset();
-    this.getElementRect(this.$refs.nav, "nav");
+    // Force recalc the pagination offsets when the orientation/navItems is change;
+    vertical: "resizable",
+    navItems: "resizable",
   },
 
   methods: {
     select(navItem) {
-      this.paginationCollapse(navItem);
-      this.sliderHandler();
       this.$emit("select", {
         tabItem: navItem,
         byUser: true,
       });
+      this.sliderHandler(navItem?.model);
+      if (this.pagination.has) {
+        this.paginationCollapse(navItem);
+      }
     },
 
-    async sliderHandler() {
-      await this.$nextTick();
+    sliderHandler(model) {
       const navItemsElement = this.$refs?.navItems;
       const { navItemsLeft, navItemsTop } = this.getElementRect({
         el: navItemsElement,
@@ -146,7 +142,7 @@ export default {
         navActiveLeft,
         navActiveTop,
       } = this.getElementRect({
-        el: this.$refs?.[this.tabItemActive.model]?.[0],
+        el: this.$refs?.[model || this.tabItemActive.model]?.[0],
         prefix: "navActive",
       });
 
@@ -169,9 +165,7 @@ export default {
       );
     },
 
-    async setPaginationOffset() {
-      await this.$nextTick();
-
+    getPagination() {
       const navItemsElement = this.$refs?.navItems;
       const { navItemsWidth } = this.getElementRect({
         el: navItemsElement,
@@ -186,14 +180,17 @@ export default {
       const navItemsHeight = [...navItemsElement?.children]
         .slice(0, -1)
         .map((el) => el.offsetHeight)
-        .reduce((a, c) => a + c, 0);
+        .reduce((a, c) => Math.abs(a + c), 0);
 
-      const paginationFactory = (has, maxOffset, minOffset) => ({
-        has,
-        maxOffset,
-        minOffset,
-        offset: minOffset,
-      });
+      const paginationFactory = (has, maxOffset, minOffset) => {
+        const paginationOffsets = Object.entries({
+          has,
+          maxOffset,
+          minOffset,
+          offset: minOffset,
+        }).map(([k, v]) => [k, Math.abs(v)]);
+        return Object.fromEntries(paginationOffsets);
+      };
 
       Object.assign(
         this.pagination,
@@ -283,8 +280,10 @@ export default {
     },
 
     resizable() {
-      this.setPaginationOffset();
-      this.sliderHandler();
+      this.$nextTick(() => {
+        this.getPagination();
+        this.sliderHandler();
+      });
     },
 
     getElementRect({ el, prefix }) {

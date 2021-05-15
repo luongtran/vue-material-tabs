@@ -66,17 +66,10 @@ export default {
       last: 0,
       previous: 0,
     },
+    tabItems: [],
   }),
 
   computed: {
-    tabItems() {
-      return this.$slots?.default
-        .map(({ componentInstance, componentOptions }) => {
-          if (componentOptions?.tag === "TabItem") return componentInstance;
-        })
-        .filter((el) => el);
-    },
-
     classes() {
       return {
         tabs: true,
@@ -109,7 +102,6 @@ export default {
   },
 
   mounted() {
-    this.setNavItems();
     this.activeTabItem({
       tabItem: this.navItems[0],
       byUser: false,
@@ -117,19 +109,16 @@ export default {
   },
 
   methods: {
-    setNavItems() {
-      const navItems = this.tabItems?.map(
-        ({ model, name, disabled, $slots }) => ({
-          model,
-          name,
-          disabled,
-          nameSlot: $slots?.name?.[0],
-        })
-      );
-      if (navItems?.length) {
-        this.navItems = navItems;
-        this.tabItemIndexes.last = navItems.length - 1;
+    setTabItem(tabItemInstance) {
+      if (tabItemInstance?.$options?._componentTag === "TabItem") {
+        this.tabItems.push(tabItemInstance);
+        this.setNavItem(tabItemInstance);
       }
+    },
+
+    setNavItem({ model, name, disabled, nameSlot }) {
+      this.navItems.push({ model, name, disabled, nameSlot });
+      this.tabItemIndexes.last = this.navItems.length - 1;
     },
 
     activeTabItem({ tabItem, byUser }) {

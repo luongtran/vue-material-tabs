@@ -2,7 +2,7 @@
   <transition :name="slideDirection">
     <div
       v-show="isActived"
-      :style="{ 'transition-duration': `${this.transition.duration}ms` }"
+      :style="{ 'transition-duration': `${transition.duration}ms` }"
       class="tab-item"
     >
       <slot />
@@ -30,7 +30,7 @@ export default {
     model: crypto.randomBytes(10).toString("hex"),
   }),
 
-  created() {
+  mounted() {
     this.tabs.setTabItem(this);
   },
 

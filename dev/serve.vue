@@ -106,7 +106,7 @@ export default Vue.extend({
     dark: false,
     slide: true,
     disabled: false,
-    add: 2,
+    add: 15,
   }),
 });
 </script>

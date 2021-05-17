@@ -13,8 +13,7 @@
         @select="activeTabItem"
       />
     </slot>
-
-    <div class="tabs__content">
+    <div v-touch="onTouchSlide" class="tabs__content">
       <slot />
     </div>
   </div>
@@ -22,12 +21,17 @@
 
 <script>
 import NavTab from "./TabNav";
+import touch from "./directives/touch";
 
 export default {
   name: "Tabs",
 
   components: {
     NavTab,
+  },
+
+  directives: {
+    touch,
   },
 
   props: {
@@ -116,8 +120,13 @@ export default {
       }
     },
 
-    setNavItem({ model, name, disabled, nameSlot }) {
-      this.navItems.push({ model, name, disabled, nameSlot });
+    setNavItem({ model, name, disabled, $slots }) {
+      this.navItems.push({
+        model,
+        name,
+        disabled,
+        nameSlot: $slots.name?.[0],
+      });
       this.tabItemIndexes.last = this.navItems.length - 1;
     },
 
@@ -143,6 +152,17 @@ export default {
     setTabItemTransitionSide() {
       const { current, previous } = this.tabItemIndexes;
       this.slideSide = current > previous ? "right" : "left";
+    },
+
+    onTouchSlide(to) {
+      let tabItem;
+      const { current, last } = this.tabItemIndexes;
+      if (to === "next" && current < last) {
+        tabItem = this.navItems[current + 1];
+      } else if (to === "prev" && current > 0) {
+        tabItem = this.navItems[current - 1];
+      }
+      tabItem && this.activeTabItem({ tabItem, byUser: true });
     },
 
     findIndexTab(tab) {

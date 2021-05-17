@@ -4,7 +4,7 @@
       <Btn
         v-if="pagination.has"
         :disabled="!paginateIndicator.prev"
-        @click="paginationHandler('prev')"
+        @click="onPagination('prev')"
       />
     </div>
     <nav ref="nav" class="tab__nav">
@@ -30,15 +30,15 @@
       <Btn
         v-if="pagination.has"
         :disabled="!paginateIndicator.next"
-        @click="paginationHandler('next')"
+        @click="onPagination('next')"
       />
     </div>
   </div>
 </template>
 
 <script>
-import ripple from "./ripple/index";
-import resize from "./resize/index";
+import ripple from "./directives/ripple";
+import resize from "./directives/resize";
 import Btn from "./Btn";
 
 export default {
@@ -46,8 +46,8 @@ export default {
     Btn,
     VNode: {
       functional: true,
-      render: (h, ctx) => {
-        return ctx.props.node ? ctx.props.node : h("span", ctx.props.name);
+      render: (h, { props }) => {
+        return props.node ? props.node : h("span", props.name);
       },
     },
   },
@@ -113,26 +113,31 @@ export default {
 
   watch: {
     // Force recalc the pagination offsets when the orientation/navItems is change;
+    navItems: "resizable",
     vertical() {
       Object.assign(this.$data, this.$options.data());
       this.resizable();
     },
-    navItems: "resizable",
+    tabItemActive(payload) {
+      this.sliderHandler();
+      if (this.pagination.has) {
+        this.paginationCollapse(payload);
+      }
+    },
   },
 
   methods: {
     select(navItem) {
-      this.$emit("select", {
-        tabItem: navItem,
-        byUser: true,
-      });
-      this.sliderHandler(navItem?.model);
-      if (this.pagination.has) {
-        this.paginationCollapse(navItem);
+      if (!navItem?.disabled) {
+        this.$emit("select", {
+          tabItem: navItem,
+          byUser: true,
+        });
       }
     },
 
-    sliderHandler(model) {
+    async sliderHandler() {
+      await this.$nextTick();
       const navItemsElement = this.$refs?.navItems;
       const { navItemsLeft, navItemsTop } = this.getElementRect({
         el: navItemsElement,
@@ -145,7 +150,7 @@ export default {
         navActiveLeft,
         navActiveTop,
       } = this.getElementRect({
-        el: this.$refs?.[model || this.tabItemActive.model]?.[0],
+        el: this.$refs?.[this.tabItemActive.model]?.[0],
         prefix: "navActive",
       });
 
@@ -212,9 +217,9 @@ export default {
       );
     },
 
-    paginationHandler(type) {
+    onPagination(to) {
       const { maxOffset, offset, translate, minOffset } = this.pagination;
-      if (type === "prev" && this.paginateIndicator.prev) {
+      if (to === "prev" && this.paginateIndicator.prev) {
         if (offset <= minOffset) {
           this.pagination.offset = minOffset;
         }
@@ -227,7 +232,7 @@ export default {
         this.pagination.translate = translate - offset;
       }
 
-      if (type === "next" && this.paginateIndicator.next) {
+      if (to === "next" && this.paginateIndicator.next) {
         if (translate + offset > maxOffset) {
           this.pagination.offset = maxOffset - translate;
         }
@@ -235,7 +240,7 @@ export default {
       }
     },
 
-    paginationCollapse({ model }) {
+    paginationCollapse() {
       const {
         navActiveRight,
         navActiveLeft,
@@ -244,7 +249,7 @@ export default {
         navActiveWidth,
         navActiveHeight,
       } = this.getElementRect({
-        el: this.$refs?.[model]?.[0],
+        el: this.$refs?.[this.tabItemActive.model]?.[0],
         prefix: "navActive",
       });
       const { navRight, navLeft, navTop, navBottom } = this.getElementRect({

@@ -275,8 +275,10 @@ var script$2 = {
     Btn: __vue_component__$3,
     VNode: {
       functional: true,
-      render: (h, ctx) => {
-        return ctx.props.node ? ctx.props.node : h("span", ctx.props.name);
+      render: (h, {
+        props
+      }) => {
+        return props.node ? props.node : h("span", props.name);
       }
     }
   },
@@ -336,29 +338,36 @@ var script$2 = {
   },
   watch: {
     // Force recalc the pagination offsets when the orientation/navItems is change;
+    navItems: "resizable",
+
     vertical() {
       Object.assign(this.$data, this.$options.data());
       this.resizable();
     },
 
-    navItems: "resizable"
+    tabItemActive(payload) {
+      this.sliderHandler();
+
+      if (this.pagination.has) {
+        this.paginationCollapse(payload);
+      }
+    }
+
   },
   methods: {
     select(navItem) {
-      this.$emit("select", {
-        tabItem: navItem,
-        byUser: true
-      });
-      this.sliderHandler(navItem === null || navItem === void 0 ? void 0 : navItem.model);
-
-      if (this.pagination.has) {
-        this.paginationCollapse(navItem);
+      if (!(navItem !== null && navItem !== void 0 && navItem.disabled)) {
+        this.$emit("select", {
+          tabItem: navItem,
+          byUser: true
+        });
       }
     },
 
-    sliderHandler(model) {
-      var _this$$refs, _this$$refs2, _this$$refs3;
+    async sliderHandler() {
+      var _this$$refs, _this$$refs2, _this$$refs2$this$tab;
 
+      await this.$nextTick();
       const navItemsElement = (_this$$refs = this.$refs) === null || _this$$refs === void 0 ? void 0 : _this$$refs.navItems;
       const {
         navItemsLeft,
@@ -373,7 +382,7 @@ var script$2 = {
         navActiveLeft,
         navActiveTop
       } = this.getElementRect({
-        el: (_this$$refs2 = this.$refs) === null || _this$$refs2 === void 0 ? void 0 : (_this$$refs3 = _this$$refs2[model || this.tabItemActive.model]) === null || _this$$refs3 === void 0 ? void 0 : _this$$refs3[0],
+        el: (_this$$refs2 = this.$refs) === null || _this$$refs2 === void 0 ? void 0 : (_this$$refs2$this$tab = _this$$refs2[this.tabItemActive.model]) === null || _this$$refs2$this$tab === void 0 ? void 0 : _this$$refs2$this$tab[0],
         prefix: "navActive"
       });
       const {
@@ -394,9 +403,9 @@ var script$2 = {
     },
 
     getPagination() {
-      var _this$$refs4, _this$$refs5;
+      var _this$$refs3, _this$$refs4;
 
-      const navItemsElement = (_this$$refs4 = this.$refs) === null || _this$$refs4 === void 0 ? void 0 : _this$$refs4.navItems;
+      const navItemsElement = (_this$$refs3 = this.$refs) === null || _this$$refs3 === void 0 ? void 0 : _this$$refs3.navItems;
       const {
         navItemsWidth
       } = this.getElementRect({
@@ -407,7 +416,7 @@ var script$2 = {
         navWidth,
         navHeight
       } = this.getElementRect({
-        el: (_this$$refs5 = this.$refs) === null || _this$$refs5 === void 0 ? void 0 : _this$$refs5.nav,
+        el: (_this$$refs4 = this.$refs) === null || _this$$refs4 === void 0 ? void 0 : _this$$refs4.nav,
         prefix: "nav"
       });
       const navItemsHeight = [...(navItemsElement === null || navItemsElement === void 0 ? void 0 : navItemsElement.children)].slice(0, -1).map(el => el.offsetHeight).reduce((a, c) => Math.abs(a + c), 0);
@@ -428,7 +437,7 @@ var script$2 = {
       }[this.orientation]);
     },
 
-    paginationHandler(type) {
+    onPagination(to) {
       const {
         maxOffset,
         offset,
@@ -436,7 +445,7 @@ var script$2 = {
         minOffset
       } = this.pagination;
 
-      if (type === "prev" && this.paginateIndicator.prev) {
+      if (to === "prev" && this.paginateIndicator.prev) {
         if (offset <= minOffset) {
           this.pagination.offset = minOffset;
         }
@@ -449,7 +458,7 @@ var script$2 = {
         this.pagination.translate = translate - offset;
       }
 
-      if (type === "next" && this.paginateIndicator.next) {
+      if (to === "next" && this.paginateIndicator.next) {
         if (translate + offset > maxOffset) {
           this.pagination.offset = maxOffset - translate;
         }
@@ -458,10 +467,8 @@ var script$2 = {
       }
     },
 
-    paginationCollapse({
-      model
-    }) {
-      var _this$$refs6, _this$$refs6$model, _this$$refs7;
+    paginationCollapse() {
+      var _this$$refs5, _this$$refs5$this$tab, _this$$refs6;
 
       const {
         navActiveRight,
@@ -471,7 +478,7 @@ var script$2 = {
         navActiveWidth,
         navActiveHeight
       } = this.getElementRect({
-        el: (_this$$refs6 = this.$refs) === null || _this$$refs6 === void 0 ? void 0 : (_this$$refs6$model = _this$$refs6[model]) === null || _this$$refs6$model === void 0 ? void 0 : _this$$refs6$model[0],
+        el: (_this$$refs5 = this.$refs) === null || _this$$refs5 === void 0 ? void 0 : (_this$$refs5$this$tab = _this$$refs5[this.tabItemActive.model]) === null || _this$$refs5$this$tab === void 0 ? void 0 : _this$$refs5$this$tab[0],
         prefix: "navActive"
       });
       const {
@@ -480,7 +487,7 @@ var script$2 = {
         navTop,
         navBottom
       } = this.getElementRect({
-        el: (_this$$refs7 = this.$refs) === null || _this$$refs7 === void 0 ? void 0 : _this$$refs7.nav,
+        el: (_this$$refs6 = this.$refs) === null || _this$$refs6 === void 0 ? void 0 : _this$$refs6.nav,
         prefix: "nav"
       });
       const {
@@ -564,7 +571,7 @@ var __vue_render__$2 = function () {
     },
     on: {
       "click": function ($event) {
-        return _vm.paginationHandler('prev');
+        return _vm.onPagination('prev');
       }
     }
   }) : _vm._e()], 1), _vm._v(" "), _c('nav', {
@@ -612,7 +619,7 @@ var __vue_render__$2 = function () {
     },
     on: {
       "click": function ($event) {
-        return _vm.paginationHandler('next');
+        return _vm.onPagination('next');
       }
     }
   }) : _vm._e()], 1)]);
@@ -623,11 +630,11 @@ var __vue_staticRenderFns__$2 = [];
 
 const __vue_inject_styles__$2 = function (inject) {
   if (!inject) return;
-  inject("data-v-2de04152_0", {
-    source: ".tab__pagination[data-v-2de04152]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-2de04152],.tab__pagination__next[data-v-2de04152]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-2de04152] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-2de04152]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-2de04152]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-2de04152]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-2de04152]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-2de04152]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-2de04152]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-2de04152]{background:#f3f2f2}.tab__slider[data-v-2de04152]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-2de04152]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-2de04152]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-2de04152]{padding:0;margin:0}.tab__pagination--vertical[data-v-2de04152] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-2de04152] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-2de04152]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-2de04152]:hover{background:#2f3236}.tab__pagination--auto .tab__nav__item[data-v-2de04152]{flex:1 auto}",
+  inject("data-v-c06add7c_0", {
+    source: ".tab__pagination[data-v-c06add7c]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-c06add7c],.tab__pagination__next[data-v-c06add7c]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-c06add7c] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-c06add7c]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-c06add7c]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-c06add7c]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-c06add7c]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-c06add7c]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-c06add7c]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-c06add7c]{background:#f3f2f2}.tab__slider[data-v-c06add7c]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-c06add7c]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-c06add7c]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-c06add7c]{padding:0;margin:0}.tab__pagination--vertical[data-v-c06add7c] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-c06add7c] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-c06add7c]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-c06add7c]:hover{background:#2f3236}.tab__pagination--auto .tab__nav__item[data-v-c06add7c]{flex:1 auto}",
     map: undefined,
     media: undefined
-  }), inject("data-v-2de04152_1", {
+  }), inject("data-v-c06add7c_1", {
     source: ".ripple{background-color:#1866c04d;border-radius:50%;position:absolute;transform:scale(0);animation:ripple .6s linear;z-index:2}@keyframes ripple{to{transform:scale(2.5);opacity:0}}",
     map: undefined,
     media: undefined
@@ -636,7 +643,7 @@ const __vue_inject_styles__$2 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$2 = "data-v-2de04152";
+const __vue_scope_id__$2 = "data-v-c06add7c";
 /* module identifier */
 
 const __vue_module_identifier__$2 = undefined;
@@ -652,11 +659,64 @@ const __vue_component__$2 = /*#__PURE__*/normalizeComponent({
   staticRenderFns: __vue_staticRenderFns__$2
 }, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, createInjector, undefined, undefined);
 
+const state = {
+  target: null,
+  touchstartX: 0,
+  touchstartY: 0,
+  isSwiping: 0
+};
+
+function start(e) {
+  if (!e) return;
+  state.isSwiping = true;
+  state.touchstartX = e === null || e === void 0 ? void 0 : e.touches[0].clientX;
+  state.touchstartY = e === null || e === void 0 ? void 0 : e.touches[0].clientY;
+}
+
+function move(e) {
+  var _state$target;
+
+  if (!state.isSwiping || !((_state$target = state.target) !== null && _state$target !== void 0 && _state$target._callback)) return;
+  const touchendX = e === null || e === void 0 ? void 0 : e.changedTouches[0].clientX;
+  const touchendY = e === null || e === void 0 ? void 0 : e.changedTouches[0].clientY;
+  const diffX = state.touchstartX - touchendX;
+  const diffY = state.touchstartY - touchendY;
+  if (diffY > 0 || diffX > 0) state.target._callback("next");else state.target._callback("prev");
+  state.isSwiping = false;
+}
+
+function listeners(add) {
+  [["touchstart", start], ["touchmove", move]].forEach(([k, v]) => {
+    var _state$target2;
+
+    state === null || state === void 0 ? void 0 : (_state$target2 = state.target) === null || _state$target2 === void 0 ? void 0 : _state$target2[add ? "addEventListener" : "removeEventListener"](k, v);
+  });
+}
+
+var touch = {
+  inserted(el, {
+    value
+  }) {
+    if (!value || !el) return;
+    state.target = el;
+    state.target._callback = value;
+    listeners(true);
+  },
+
+  unbind() {
+    listeners(false);
+  }
+
+};
+
 //
 var script$1 = {
   name: "Tabs",
   components: {
     NavTab: __vue_component__$2
+  },
+  directives: {
+    touch
   },
   props: {
     dark: Boolean,
@@ -749,13 +809,15 @@ var script$1 = {
       model,
       name,
       disabled,
-      nameSlot
+      $slots
     }) {
+      var _$slots$name;
+
       this.navItems.push({
         model,
         name,
         disabled,
-        nameSlot
+        nameSlot: (_$slots$name = $slots.name) === null || _$slots$name === void 0 ? void 0 : _$slots$name[0]
       });
       this.tabItemIndexes.last = this.navItems.length - 1;
     },
@@ -794,6 +856,25 @@ var script$1 = {
       this.slideSide = current > previous ? "right" : "left";
     },
 
+    onTouchSlide(to) {
+      let tabItem;
+      const {
+        current,
+        last
+      } = this.tabItemIndexes;
+
+      if (to === "next" && current < last) {
+        tabItem = this.navItems[current + 1];
+      } else if (to === "prev" && current > 0) {
+        tabItem = this.navItems[current - 1];
+      }
+
+      tabItem && this.activeTabItem({
+        tabItem,
+        byUser: true
+      });
+    },
+
     findIndexTab(tab) {
       return this.tabItems.findIndex(el => el.model == tab.model);
     }
@@ -829,6 +910,12 @@ var __vue_render__$1 = function () {
     "items": _vm.navItems,
     "active": _vm.tabItemActive
   }), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "touch",
+      rawName: "v-touch",
+      value: _vm.onTouchSlide,
+      expression: "onTouchSlide"
+    }],
     staticClass: "tabs__content"
   }, [_vm._t("default")], 2)], 2);
 };
@@ -838,8 +925,8 @@ var __vue_staticRenderFns__$1 = [];
 
 const __vue_inject_styles__$1 = function (inject) {
   if (!inject) return;
-  inject("data-v-281cca8c_0", {
-    source: ".tabs[data-v-281cca8c]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%}.tabs__content[data-v-281cca8c]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-281cca8c]{flex-direction:row}.tabs--dark[data-v-281cca8c]{background:#222831}.tabs--dark .tabs__nav__item[data-v-281cca8c]{color:#f1f1f1}.tabs--dark .tabs__nav__items .active[data-v-281cca8c]{color:#fff}.tabs--dark .tabs__nav__items .disabled[data-v-281cca8c]{background:#2c2f35}.tabs--dark .tab__pagination[data-v-281cca8c] .btn svg{fill:#d6d5d5}.tabs--dark .tab__pagination[data-v-281cca8c] .btn:disabled svg{fill:#56575c}.tabs--dark .tab__pagination[data-v-281cca8c] .tab__nav__item:hover{background:#424750}",
+  inject("data-v-3d0a3126_0", {
+    source: ".tabs[data-v-3d0a3126]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%}.tabs__content[data-v-3d0a3126]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-3d0a3126]{flex-direction:row}.tabs--dark[data-v-3d0a3126]{background:#222831}.tabs--dark .tabs__nav__item[data-v-3d0a3126]{color:#f1f1f1}.tabs--dark .tabs__nav__items .active[data-v-3d0a3126]{color:#fff}.tabs--dark .tabs__nav__items .disabled[data-v-3d0a3126]{background:#2c2f35}.tabs--dark .tab__pagination[data-v-3d0a3126] .btn svg{fill:#d6d5d5}.tabs--dark .tab__pagination[data-v-3d0a3126] .btn:disabled svg{fill:#56575c}.tabs--dark .tab__pagination[data-v-3d0a3126] .tab__nav__item:hover{background:#424750}",
     map: undefined,
     media: undefined
   });
@@ -847,7 +934,7 @@ const __vue_inject_styles__$1 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$1 = "data-v-281cca8c";
+const __vue_scope_id__$1 = "data-v-3d0a3126";
 /* module identifier */
 
 const __vue_module_identifier__$1 = undefined;
@@ -891,7 +978,7 @@ var script = {
     model: crypto.randomBytes(10).toString("hex")
   }),
 
-  created() {
+  mounted() {
     this.tabs.setTabItem(this);
   },
 
@@ -964,7 +1051,7 @@ var __vue_render__ = function () {
     }],
     staticClass: "tab-item",
     style: {
-      'transition-duration': this.transition.duration + "ms"
+      'transition-duration': _vm.transition.duration + "ms"
     }
   }, [_vm._t("default")], 2)]);
 };
@@ -974,8 +1061,8 @@ var __vue_staticRenderFns__ = [];
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-a315dbc4_0", {
-    source: ".tab-item[data-v-a315dbc4]{position:absolute;top:0;left:0;z-index:1;height:100%;width:100%;transition:transform cubic-bezier(.25,.8,.5,1)}.slide-left-enter[data-v-a315dbc4],.slide-right-leave-to[data-v-a315dbc4]{transform:translateX(-100%)}.slide-left-leave-to[data-v-a315dbc4],.slide-right-enter[data-v-a315dbc4]{transform:translateX(100%)}.slide-bottom-leave-to[data-v-a315dbc4],.slide-top-enter[data-v-a315dbc4]{transform:translateY(-100%)}.slide-bottom-enter[data-v-a315dbc4],.slide-top-leave-to[data-v-a315dbc4]{transform:translateY(100%)}",
+  inject("data-v-2610bb0c_0", {
+    source: ".tab-item[data-v-2610bb0c]{position:absolute;top:0;left:0;z-index:1;height:100%;width:100%;transition:transform cubic-bezier(.25,.8,.5,1)}.slide-left-enter[data-v-2610bb0c],.slide-right-leave-to[data-v-2610bb0c]{transform:translateX(-100%)}.slide-left-leave-to[data-v-2610bb0c],.slide-right-enter[data-v-2610bb0c]{transform:translateX(100%)}.slide-bottom-leave-to[data-v-2610bb0c],.slide-top-enter[data-v-2610bb0c]{transform:translateY(-100%)}.slide-bottom-enter[data-v-2610bb0c],.slide-top-leave-to[data-v-2610bb0c]{transform:translateY(100%)}",
     map: undefined,
     media: undefined
   });
@@ -983,7 +1070,7 @@ const __vue_inject_styles__ = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__ = "data-v-a315dbc4";
+const __vue_scope_id__ = "data-v-2610bb0c";
 /* module identifier */
 
 const __vue_module_identifier__ = undefined;

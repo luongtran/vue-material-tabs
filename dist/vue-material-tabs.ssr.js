@@ -1,4 +1,40 @@
-'use strict';function _slicedToArray(arr, i) {
+'use strict';function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+
+      _next(undefined);
+    });
+  };
+}
+
+function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
@@ -316,8 +352,9 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
     Btn: __vue_component__$3,
     VNode: {
       functional: true,
-      render: function render(h, ctx) {
-        return ctx.props.node ? ctx.props.node : h("span", ctx.props.name);
+      render: function render(h, _ref) {
+        var props = _ref.props;
+        return props.node ? props.node : h("span", props.name);
       }
     }
   },
@@ -375,63 +412,79 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
   },
   watch: {
     // Force recalc the pagination offsets when the orientation/navItems is change;
+    navItems: "resizable",
     vertical: function vertical() {
       Object.assign(this.$data, this.$options.data());
       this.resizable();
     },
-    navItems: "resizable"
+    tabItemActive: function tabItemActive(payload) {
+      this.sliderHandler();
+
+      if (this.pagination.has) {
+        this.paginationCollapse(payload);
+      }
+    }
   },
   methods: {
     select: function select(navItem) {
-      this.$emit("select", {
-        tabItem: navItem,
-        byUser: true
-      });
-      this.sliderHandler(navItem === null || navItem === void 0 ? void 0 : navItem.model);
-
-      if (this.pagination.has) {
-        this.paginationCollapse(navItem);
+      if (!(navItem !== null && navItem !== void 0 && navItem.disabled)) {
+        this.$emit("select", {
+          tabItem: navItem,
+          byUser: true
+        });
       }
     },
-    sliderHandler: function sliderHandler(model) {
-      var _this$$refs, _this$$refs2, _this$$refs3;
+    sliderHandler: function sliderHandler() {
+      var _this = this;
 
-      var navItemsElement = (_this$$refs = this.$refs) === null || _this$$refs === void 0 ? void 0 : _this$$refs.navItems;
+      return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var _this$$refs, _this$$refs2, _this$$refs2$_this$ta;
 
-      var _this$getElementRect = this.getElementRect({
-        el: navItemsElement,
-        prefix: "navItems"
-      }),
-          navItemsLeft = _this$getElementRect.navItemsLeft,
-          navItemsTop = _this$getElementRect.navItemsTop;
+        var navItemsElement, _this$getElementRect, navItemsLeft, navItemsTop, _this$getElementRect2, navActiveWidth, navActiveHeight, navActiveLeft, navActiveTop, children, sliderEl;
 
-      var _this$getElementRect2 = this.getElementRect({
-        el: (_this$$refs2 = this.$refs) === null || _this$$refs2 === void 0 ? void 0 : (_this$$refs3 = _this$$refs2[model || this.tabItemActive.model]) === null || _this$$refs3 === void 0 ? void 0 : _this$$refs3[0],
-        prefix: "navActive"
-      }),
-          navActiveWidth = _this$getElementRect2.navActiveWidth,
-          navActiveHeight = _this$getElementRect2.navActiveHeight,
-          navActiveLeft = _this$getElementRect2.navActiveLeft,
-          navActiveTop = _this$getElementRect2.navActiveTop;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return _this.$nextTick();
 
-      var children = navItemsElement.children;
-      var sliderEl = children[children.length - 1];
-      sliderEl.removeAttribute("style");
-      Object.assign(sliderEl.style, {
-        portrait: {
-          height: "".concat(navActiveHeight, "px"),
-          top: "".concat(navActiveTop - navItemsTop, "px")
-        },
-        landscape: {
-          width: "".concat(navActiveWidth, "px"),
-          left: "".concat(navActiveLeft - navItemsLeft, "px")
-        }
-      }[this.orientation]);
+              case 2:
+                navItemsElement = (_this$$refs = _this.$refs) === null || _this$$refs === void 0 ? void 0 : _this$$refs.navItems;
+                _this$getElementRect = _this.getElementRect({
+                  el: navItemsElement,
+                  prefix: "navItems"
+                }), navItemsLeft = _this$getElementRect.navItemsLeft, navItemsTop = _this$getElementRect.navItemsTop;
+                _this$getElementRect2 = _this.getElementRect({
+                  el: (_this$$refs2 = _this.$refs) === null || _this$$refs2 === void 0 ? void 0 : (_this$$refs2$_this$ta = _this$$refs2[_this.tabItemActive.model]) === null || _this$$refs2$_this$ta === void 0 ? void 0 : _this$$refs2$_this$ta[0],
+                  prefix: "navActive"
+                }), navActiveWidth = _this$getElementRect2.navActiveWidth, navActiveHeight = _this$getElementRect2.navActiveHeight, navActiveLeft = _this$getElementRect2.navActiveLeft, navActiveTop = _this$getElementRect2.navActiveTop;
+                children = navItemsElement.children;
+                sliderEl = children[children.length - 1];
+                sliderEl.removeAttribute("style");
+                Object.assign(sliderEl.style, {
+                  portrait: {
+                    height: "".concat(navActiveHeight, "px"),
+                    top: "".concat(navActiveTop - navItemsTop, "px")
+                  },
+                  landscape: {
+                    width: "".concat(navActiveWidth, "px"),
+                    left: "".concat(navActiveLeft - navItemsLeft, "px")
+                  }
+                }[_this.orientation]);
+
+              case 9:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
     },
     getPagination: function getPagination() {
-      var _this$$refs4, _this$$refs5;
+      var _this$$refs3, _this$$refs4;
 
-      var navItemsElement = (_this$$refs4 = this.$refs) === null || _this$$refs4 === void 0 ? void 0 : _this$$refs4.navItems;
+      var navItemsElement = (_this$$refs3 = this.$refs) === null || _this$$refs3 === void 0 ? void 0 : _this$$refs3.navItems;
 
       var _this$getElementRect3 = this.getElementRect({
         el: navItemsElement,
@@ -440,7 +493,7 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
           navItemsWidth = _this$getElementRect3.navItemsWidth;
 
       var _this$getElementRect4 = this.getElementRect({
-        el: (_this$$refs5 = this.$refs) === null || _this$$refs5 === void 0 ? void 0 : _this$$refs5.nav,
+        el: (_this$$refs4 = this.$refs) === null || _this$$refs4 === void 0 ? void 0 : _this$$refs4.nav,
         prefix: "nav"
       }),
           navWidth = _this$getElementRect4.navWidth,
@@ -458,10 +511,10 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
           maxOffset: maxOffset,
           minOffset: minOffset,
           offset: minOffset
-        }).map(function (_ref) {
-          var _ref2 = _slicedToArray(_ref, 2),
-              k = _ref2[0],
-              v = _ref2[1];
+        }).map(function (_ref2) {
+          var _ref3 = _slicedToArray(_ref2, 2),
+              k = _ref3[0],
+              v = _ref3[1];
 
           return [k, Math.abs(v)];
         });
@@ -473,14 +526,14 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
         landscape: paginationFactory(navItemsWidth > navWidth, navItemsWidth - navWidth, navWidth)
       }[this.orientation]);
     },
-    paginationHandler: function paginationHandler(type) {
+    onPagination: function onPagination(to) {
       var _this$pagination = this.pagination,
           maxOffset = _this$pagination.maxOffset,
           offset = _this$pagination.offset,
           translate = _this$pagination.translate,
           minOffset = _this$pagination.minOffset;
 
-      if (type === "prev" && this.paginateIndicator.prev) {
+      if (to === "prev" && this.paginateIndicator.prev) {
         if (offset <= minOffset) {
           this.pagination.offset = minOffset;
         }
@@ -493,7 +546,7 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
         this.pagination.translate = translate - offset;
       }
 
-      if (type === "next" && this.paginateIndicator.next) {
+      if (to === "next" && this.paginateIndicator.next) {
         if (translate + offset > maxOffset) {
           this.pagination.offset = maxOffset - translate;
         }
@@ -501,13 +554,11 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
         this.pagination.translate = translate + this.pagination.offset;
       }
     },
-    paginationCollapse: function paginationCollapse(_ref3) {
-      var _this$$refs6, _this$$refs6$model, _this$$refs7;
-
-      var model = _ref3.model;
+    paginationCollapse: function paginationCollapse() {
+      var _this$$refs5, _this$$refs5$this$tab, _this$$refs6;
 
       var _this$getElementRect5 = this.getElementRect({
-        el: (_this$$refs6 = this.$refs) === null || _this$$refs6 === void 0 ? void 0 : (_this$$refs6$model = _this$$refs6[model]) === null || _this$$refs6$model === void 0 ? void 0 : _this$$refs6$model[0],
+        el: (_this$$refs5 = this.$refs) === null || _this$$refs5 === void 0 ? void 0 : (_this$$refs5$this$tab = _this$$refs5[this.tabItemActive.model]) === null || _this$$refs5$this$tab === void 0 ? void 0 : _this$$refs5$this$tab[0],
         prefix: "navActive"
       }),
           navActiveRight = _this$getElementRect5.navActiveRight,
@@ -518,7 +569,7 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
           navActiveHeight = _this$getElementRect5.navActiveHeight;
 
       var _this$getElementRect6 = this.getElementRect({
-        el: (_this$$refs7 = this.$refs) === null || _this$$refs7 === void 0 ? void 0 : _this$$refs7.nav,
+        el: (_this$$refs6 = this.$refs) === null || _this$$refs6 === void 0 ? void 0 : _this$$refs6.nav,
         prefix: "nav"
       }),
           navRight = _this$getElementRect6.navRight,
@@ -555,12 +606,12 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
       this.pagination.translate = Math.abs(toTranslate);
     },
     resizable: function resizable() {
-      var _this = this;
+      var _this2 = this;
 
       this.$nextTick(function () {
-        _this.getPagination();
+        _this2.getPagination();
 
-        _this.sliderHandler();
+        _this2.sliderHandler();
       });
     },
     getElementRect: function getElementRect(_ref4) {
@@ -599,16 +650,16 @@ var __vue_render__$2 = function __vue_render__() {
       expression: "resizable"
     }],
     class: _vm.classes
-  }, [_vm._ssrNode("<div class=\"tab__pagination__prev\" data-v-2de04152>", "</div>", [_vm.pagination.has ? _c('Btn', {
+  }, [_vm._ssrNode("<div class=\"tab__pagination__prev\" data-v-c06add7c>", "</div>", [_vm.pagination.has ? _c('Btn', {
     attrs: {
       "disabled": !_vm.paginateIndicator.prev
     },
     on: {
       "click": function click($event) {
-        return _vm.paginationHandler('prev');
+        return _vm.onPagination('prev');
       }
     }
-  }) : _vm._e()], 1), _vm._ssrNode(" "), _vm._ssrNode("<nav class=\"tab__nav\" data-v-2de04152>", "</nav>", [_vm._ssrNode("<ul class=\"tab__nav__items\"" + _vm._ssrStyle(null, _vm.styles, null) + " data-v-2de04152>", "</ul>", [_vm._l(_vm.navItems, function (navItem, index) {
+  }) : _vm._e()], 1), _vm._ssrNode(" "), _vm._ssrNode("<nav class=\"tab__nav\" data-v-c06add7c>", "</nav>", [_vm._ssrNode("<ul class=\"tab__nav__items\"" + _vm._ssrStyle(null, _vm.styles, null) + " data-v-c06add7c>", "</ul>", [_vm._l(_vm.navItems, function (navItem, index) {
     return _c('li', {
       directives: [{
         name: "ripple",
@@ -636,13 +687,13 @@ var __vue_render__$2 = function __vue_render__() {
         "name": navItem.name
       }
     })], 1);
-  }), _vm._ssrNode(" " + (_vm.navSlider ? "<hr class=\"tab__slider\" data-v-2de04152>" : "<!---->"))], 2)]), _vm._ssrNode(" "), _vm._ssrNode("<div class=\"tab__pagination__next\" data-v-2de04152>", "</div>", [_vm.pagination.has ? _c('Btn', {
+  }), _vm._ssrNode(" " + (_vm.navSlider ? "<hr class=\"tab__slider\" data-v-c06add7c>" : "<!---->"))], 2)]), _vm._ssrNode(" "), _vm._ssrNode("<div class=\"tab__pagination__next\" data-v-c06add7c>", "</div>", [_vm.pagination.has ? _c('Btn', {
     attrs: {
       "disabled": !_vm.paginateIndicator.next
     },
     on: {
       "click": function click($event) {
-        return _vm.paginationHandler('next');
+        return _vm.onPagination('next');
       }
     }
   }) : _vm._e()], 1)], 2);
@@ -653,11 +704,11 @@ var __vue_staticRenderFns__$2 = [];
 
 var __vue_inject_styles__$2 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-2de04152_0", {
-    source: ".tab__pagination[data-v-2de04152]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-2de04152],.tab__pagination__next[data-v-2de04152]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-2de04152] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-2de04152]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-2de04152]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-2de04152]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-2de04152]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-2de04152]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-2de04152]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-2de04152]{background:#f3f2f2}.tab__slider[data-v-2de04152]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-2de04152]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-2de04152]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-2de04152]{padding:0;margin:0}.tab__pagination--vertical[data-v-2de04152] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-2de04152] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-2de04152]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-2de04152]:hover{background:#2f3236}.tab__pagination--auto .tab__nav__item[data-v-2de04152]{flex:1 auto}",
+  inject("data-v-c06add7c_0", {
+    source: ".tab__pagination[data-v-c06add7c]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-c06add7c],.tab__pagination__next[data-v-c06add7c]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-c06add7c] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-c06add7c]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-c06add7c]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-c06add7c]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-c06add7c]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-c06add7c]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-c06add7c]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-c06add7c]{background:#f3f2f2}.tab__slider[data-v-c06add7c]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-c06add7c]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-c06add7c]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-c06add7c]{padding:0;margin:0}.tab__pagination--vertical[data-v-c06add7c] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-c06add7c] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-c06add7c]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-c06add7c]:hover{background:#2f3236}.tab__pagination--auto .tab__nav__item[data-v-c06add7c]{flex:1 auto}",
     map: undefined,
     media: undefined
-  }), inject("data-v-2de04152_1", {
+  }), inject("data-v-c06add7c_1", {
     source: ".ripple{background-color:#1866c04d;border-radius:50%;position:absolute;transform:scale(0);animation:ripple .6s linear;z-index:2}@keyframes ripple{to{transform:scale(2.5);opacity:0}}",
     map: undefined,
     media: undefined
@@ -666,10 +717,10 @@ var __vue_inject_styles__$2 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$2 = "data-v-2de04152";
+var __vue_scope_id__$2 = "data-v-c06add7c";
 /* module identifier */
 
-var __vue_module_identifier__$2 = "data-v-2de04152";
+var __vue_module_identifier__$2 = "data-v-c06add7c";
 /* functional template */
 
 var __vue_is_functional_template__$2 = false;
@@ -678,11 +729,63 @@ var __vue_is_functional_template__$2 = false;
 var __vue_component__$2 = /*#__PURE__*/normalizeComponent({
   render: __vue_render__$2,
   staticRenderFns: __vue_staticRenderFns__$2
-}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, undefined, createInjectorSSR, undefined);//
+}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, undefined, createInjectorSSR, undefined);var state = {
+  target: null,
+  touchstartX: 0,
+  touchstartY: 0,
+  isSwiping: 0
+};
+
+function start(e) {
+  if (!e) return;
+  state.isSwiping = true;
+  state.touchstartX = e === null || e === void 0 ? void 0 : e.touches[0].clientX;
+  state.touchstartY = e === null || e === void 0 ? void 0 : e.touches[0].clientY;
+}
+
+function move(e) {
+  var _state$target;
+
+  if (!state.isSwiping || !((_state$target = state.target) !== null && _state$target !== void 0 && _state$target._callback)) return;
+  var touchendX = e === null || e === void 0 ? void 0 : e.changedTouches[0].clientX;
+  var touchendY = e === null || e === void 0 ? void 0 : e.changedTouches[0].clientY;
+  var diffX = state.touchstartX - touchendX;
+  var diffY = state.touchstartY - touchendY;
+  if (diffY > 0 || diffX > 0) state.target._callback("next");else state.target._callback("prev");
+  state.isSwiping = false;
+}
+
+function listeners(add) {
+  [["touchstart", start], ["touchmove", move]].forEach(function (_ref) {
+    var _state$target2;
+
+    var _ref2 = _slicedToArray(_ref, 2),
+        k = _ref2[0],
+        v = _ref2[1];
+
+    state === null || state === void 0 ? void 0 : (_state$target2 = state.target) === null || _state$target2 === void 0 ? void 0 : _state$target2[add ? "addEventListener" : "removeEventListener"](k, v);
+  });
+}
+
+var touch = {
+  inserted: function inserted(el, _ref3) {
+    var value = _ref3.value;
+    if (!value || !el) return;
+    state.target = el;
+    state.target._callback = value;
+    listeners(true);
+  },
+  unbind: function unbind() {
+    listeners(false);
+  }
+};//
 var script$1 = {
   name: "Tabs",
   components: {
     NavTab: __vue_component__$2
+  },
+  directives: {
+    touch: touch
   },
   props: {
     dark: Boolean,
@@ -768,15 +871,17 @@ var script$1 = {
       }
     },
     setNavItem: function setNavItem(_ref) {
+      var _$slots$name;
+
       var model = _ref.model,
           name = _ref.name,
           disabled = _ref.disabled,
-          nameSlot = _ref.nameSlot;
+          $slots = _ref.$slots;
       this.navItems.push({
         model: model,
         name: name,
         disabled: disabled,
-        nameSlot: nameSlot
+        nameSlot: (_$slots$name = $slots.name) === null || _$slots$name === void 0 ? void 0 : _$slots$name[0]
       });
       this.tabItemIndexes.last = this.navItems.length - 1;
     },
@@ -808,6 +913,23 @@ var script$1 = {
           current = _this$tabItemIndexes2.current,
           previous = _this$tabItemIndexes2.previous;
       this.slideSide = current > previous ? "right" : "left";
+    },
+    onTouchSlide: function onTouchSlide(to) {
+      var tabItem;
+      var _this$tabItemIndexes3 = this.tabItemIndexes,
+          current = _this$tabItemIndexes3.current,
+          last = _this$tabItemIndexes3.last;
+
+      if (to === "next" && current < last) {
+        tabItem = this.navItems[current + 1];
+      } else if (to === "prev" && current > 0) {
+        tabItem = this.navItems[current - 1];
+      }
+
+      tabItem && this.activeTabItem({
+        tabItem: tabItem,
+        byUser: true
+      });
     },
     findIndexTab: function findIndexTab(tab) {
       return this.tabItems.findIndex(function (el) {
@@ -842,7 +964,15 @@ var __vue_render__$1 = function __vue_render__() {
   }, false))], {
     "items": _vm.navItems,
     "active": _vm.tabItemActive
-  }), _vm._ssrNode(" "), _vm._ssrNode("<div class=\"tabs__content\" data-v-281cca8c>", "</div>", [_vm._t("default")], 2)], 2);
+  }), _vm._ssrNode(" "), _c('div', {
+    directives: [{
+      name: "touch",
+      rawName: "v-touch",
+      value: _vm.onTouchSlide,
+      expression: "onTouchSlide"
+    }],
+    staticClass: "tabs__content"
+  }, [_vm._t("default")], 2)], 2);
 };
 
 var __vue_staticRenderFns__$1 = [];
@@ -850,8 +980,8 @@ var __vue_staticRenderFns__$1 = [];
 
 var __vue_inject_styles__$1 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-281cca8c_0", {
-    source: ".tabs[data-v-281cca8c]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%}.tabs__content[data-v-281cca8c]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-281cca8c]{flex-direction:row}.tabs--dark[data-v-281cca8c]{background:#222831}.tabs--dark .tabs__nav__item[data-v-281cca8c]{color:#f1f1f1}.tabs--dark .tabs__nav__items .active[data-v-281cca8c]{color:#fff}.tabs--dark .tabs__nav__items .disabled[data-v-281cca8c]{background:#2c2f35}.tabs--dark .tab__pagination[data-v-281cca8c] .btn svg{fill:#d6d5d5}.tabs--dark .tab__pagination[data-v-281cca8c] .btn:disabled svg{fill:#56575c}.tabs--dark .tab__pagination[data-v-281cca8c] .tab__nav__item:hover{background:#424750}",
+  inject("data-v-3d0a3126_0", {
+    source: ".tabs[data-v-3d0a3126]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%}.tabs__content[data-v-3d0a3126]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-3d0a3126]{flex-direction:row}.tabs--dark[data-v-3d0a3126]{background:#222831}.tabs--dark .tabs__nav__item[data-v-3d0a3126]{color:#f1f1f1}.tabs--dark .tabs__nav__items .active[data-v-3d0a3126]{color:#fff}.tabs--dark .tabs__nav__items .disabled[data-v-3d0a3126]{background:#2c2f35}.tabs--dark .tab__pagination[data-v-3d0a3126] .btn svg{fill:#d6d5d5}.tabs--dark .tab__pagination[data-v-3d0a3126] .btn:disabled svg{fill:#56575c}.tabs--dark .tab__pagination[data-v-3d0a3126] .tab__nav__item:hover{background:#424750}",
     map: undefined,
     media: undefined
   });
@@ -859,10 +989,10 @@ var __vue_inject_styles__$1 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$1 = "data-v-281cca8c";
+var __vue_scope_id__$1 = "data-v-3d0a3126";
 /* module identifier */
 
-var __vue_module_identifier__$1 = "data-v-281cca8c";
+var __vue_module_identifier__$1 = "data-v-3d0a3126";
 /* functional template */
 
 var __vue_is_functional_template__$1 = false;
@@ -900,7 +1030,7 @@ var script = {
       model: crypto.randomBytes(10).toString("hex")
     };
   },
-  created: function created() {
+  mounted: function mounted() {
     this.tabs.setTabItem(this);
   },
   computed: {
@@ -968,7 +1098,7 @@ var __vue_render__ = function __vue_render__() {
     }],
     staticClass: "tab-item",
     style: {
-      'transition-duration': this.transition.duration + "ms"
+      'transition-duration': _vm.transition.duration + "ms"
     }
   }, [_vm._t("default")], 2)]);
 };
@@ -978,8 +1108,8 @@ var __vue_staticRenderFns__ = [];
 
 var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-a315dbc4_0", {
-    source: ".tab-item[data-v-a315dbc4]{position:absolute;top:0;left:0;z-index:1;height:100%;width:100%;transition:transform cubic-bezier(.25,.8,.5,1)}.slide-left-enter[data-v-a315dbc4],.slide-right-leave-to[data-v-a315dbc4]{transform:translateX(-100%)}.slide-left-leave-to[data-v-a315dbc4],.slide-right-enter[data-v-a315dbc4]{transform:translateX(100%)}.slide-bottom-leave-to[data-v-a315dbc4],.slide-top-enter[data-v-a315dbc4]{transform:translateY(-100%)}.slide-bottom-enter[data-v-a315dbc4],.slide-top-leave-to[data-v-a315dbc4]{transform:translateY(100%)}",
+  inject("data-v-2610bb0c_0", {
+    source: ".tab-item[data-v-2610bb0c]{position:absolute;top:0;left:0;z-index:1;height:100%;width:100%;transition:transform cubic-bezier(.25,.8,.5,1)}.slide-left-enter[data-v-2610bb0c],.slide-right-leave-to[data-v-2610bb0c]{transform:translateX(-100%)}.slide-left-leave-to[data-v-2610bb0c],.slide-right-enter[data-v-2610bb0c]{transform:translateX(100%)}.slide-bottom-leave-to[data-v-2610bb0c],.slide-top-enter[data-v-2610bb0c]{transform:translateY(-100%)}.slide-bottom-enter[data-v-2610bb0c],.slide-top-leave-to[data-v-2610bb0c]{transform:translateY(100%)}",
     map: undefined,
     media: undefined
   });
@@ -987,10 +1117,10 @@ var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__ = "data-v-a315dbc4";
+var __vue_scope_id__ = "data-v-2610bb0c";
 /* module identifier */
 
-var __vue_module_identifier__ = "data-v-a315dbc4";
+var __vue_module_identifier__ = "data-v-2610bb0c";
 /* functional template */
 
 var __vue_is_functional_template__ = false;

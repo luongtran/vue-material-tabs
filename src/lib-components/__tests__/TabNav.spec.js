@@ -52,9 +52,6 @@ describe("TabNav.vue", () => {
 
     wrapper.setData({ pagination: { translate } });
     expect(wrapper.vm.styles.transform).toEqual("translateY(-500px)");
-
-    await wrapper.setProps({ vertical: false });
-    expect(wrapper.vm.styles.transform).toEqual("translateX(-500px)");
   });
 
   it("Should have accept the correct pagination type", async () => {

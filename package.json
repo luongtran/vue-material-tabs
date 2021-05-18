@@ -1,6 +1,6 @@
 {
   "name": "vue-material-tabs",
-  "version": "0.0.5",
+  "version": "0.0.9",
   "description": "Vue.js tabs component based in material design",
   "author": "Jairo Blatt <jairoblatt@gmail.com>",
   "scripts": {

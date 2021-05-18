@@ -7,7 +7,7 @@
         @click="onPagination('prev')"
       />
     </div>
-    <nav ref="nav" class="tab__nav">
+    <nav v-touch="onPagination" ref="nav" class="tab__nav">
       <ul ref="navItems" class="tab__nav__items" :style="styles">
         <li
           v-ripple="ripple && !navItem.disabled"
@@ -39,6 +39,7 @@
 <script>
 import ripple from "./directives/ripple";
 import resize from "./directives/resize";
+import touch from "./directives/touch";
 import Btn from "./Btn";
 
 export default {
@@ -55,6 +56,7 @@ export default {
   directives: {
     ripple,
     resize,
+    touch,
   },
 
   props: {

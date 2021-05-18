@@ -1,49 +1,47 @@
 const state = {
-  target: null,
   touchstartX: 0,
   isSwiping: false,
 };
 
-function start(e) {
-  if (!e) return;
+function addListeners(el) {
+  el.addEventListener("touchstart", onTouchStart);
+  el.addEventListener("touchmove", onTouchMove);
+}
+
+function removeListeners(el) {
+  el.removeEventListener("touchstart", onTouchStart);
+  el.removeEventListener("touchmove", onTouchMove);
+}
+
+function onTouchStart(e) {
   state.isSwiping = true;
   state.touchstartX = e.touches[0].clientX;
 }
 
-function move(e) {
+function onTouchMove(e) {
   if (!state.isSwiping) return;
+  const el = e.currentTarget;
   const touchendX = e.changedTouches[0].clientX;
   const diffX = state.touchstartX - touchendX;
-  // min touch is 10% of target width
-  const minTouch = state.target.offsetWidth * 0.1;
-
+  const minTouch = Math.abs(el.offsetWidth * 0.1);
   if (diffX > minTouch) {
     state.isSwiping = false;
-    state.target._callback("next");
+    el._callback("next");
   } else if (diffX < -minTouch) {
     state.isSwiping = false;
-    state.target._callback("prev");
+    el._callback("prev");
   }
 }
 
-function listeners(add) {
-  [
-    ["touchstart", start],
-    ["touchmove", move],
-  ].forEach(([k, v]) => {
-    state?.target?.[add ? "addEventListener" : "removeEventListener"](k, v);
-  });
-}
-
 export default {
-  inserted(el, { value }) {
+  bind(el, { value }) {
     if (!value || !el) return;
-    state.target = el;
-    state.target._callback = value;
-    listeners(true);
+    el._callback = value;
+    addListeners(el);
   },
 
-  unbind() {
-    listeners(false);
+  unbind(el) {
+    removeListeners(el);
+    delete el._callback;
   },
 };

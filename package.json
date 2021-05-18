@@ -1,27 +1,26 @@
 {
   "name": "vue-material-tabs",
-  "version": "0.0.5",
+  "version": "0.0.9",
   "description": "Vue.js tabs component based in material design",
-  "license": "MIT",
   "author": "Jairo Blatt <jairoblatt@gmail.com>",
+  "scripts": {
+    "serve": "vue-cli-service serve dev/serve.js",
+    "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
+    "lint": "vue-cli-service lint",
+    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
+    "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
+    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife",
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  },
   "main": "dist/vue-material-tabs.ssr.js",
-  "browser": "dist/vue-material-tabs.esm.js",
   "module": "dist/vue-material-tabs.esm.js",
+  "browser": "dist/vue-material-tabs.esm.js",
   "unpkg": "dist/vue-material-tabs.min.js",
   "files": [
     "dist/*",
     "src/**/*.vue"
   ],
-  "sideEffects": false,
-  "scripts": {
-    "serve": "vue-cli-service serve dev/serve.js",
-    "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
-    "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
-    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
-    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife",
-    "test": "jest",
-    "test:watch": "jest --watchAll"
-  },
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.14.2",
@@ -35,12 +34,17 @@
     "@rollup/plugin-replace": "^2.3.4",
     "@vue/babel-preset-app": "^4.5.13",
     "@vue/cli-plugin-babel": "^4.5.10",
+    "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-service": "^4.5.10",
     "@vue/test-utils": "^1.2.0",
     "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.3",
     "cross-env": "^7.0.3",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
     "jest": "^26.6.3",
+    "lint-staged": "^9.5.0",
     "minimist": "^1.2.5",
     "rollup": "^2.36.1",
     "rollup-plugin-terser": "^7.0.2",
@@ -55,5 +59,22 @@
   "engines": {
     "node": ">=12"
   },
-  "repository": "https://github.com/jairoblatt/vue-material-tabs"
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "keywords": [
+    "vue2",
+    "tabs",
+    "material",
+    "component"
+  ],
+  "license": "MIT",
+  "lint-staged": {
+    "*.{js,jsx,vue}": [
+      "vue-cli-service lint",
+      "git add"
+    ]
+  },
+  "repository": "https://github.com/jairoblatt/vue-material-tabs",
+  "sideEffects": false
 }

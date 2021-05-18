@@ -172,6 +172,56 @@ function unbind(el) {
 var resize = {
   inserted: inserted,
   unbind: unbind
+};var state = {
+  touchstartX: 0,
+  isSwiping: false
+};
+
+function addListeners(el) {
+  el.addEventListener("touchstart", onTouchStart);
+  el.addEventListener("touchmove", onTouchMove);
+}
+
+function removeListeners(el) {
+  el.removeEventListener("touchstart", onTouchStart);
+  el.removeEventListener("touchmove", onTouchMove);
+}
+
+function onTouchStart(e) {
+  state.isSwiping = true;
+  state.touchstartX = e.touches[0].clientX;
+}
+
+function onTouchMove(e) {
+  if (!state.isSwiping) return;
+  var el = e.currentTarget;
+  var touchendX = e.changedTouches[0].clientX;
+  var diffX = state.touchstartX - touchendX;
+  var minTouch = Math.abs(el.offsetWidth * 0.1);
+
+  if (diffX > minTouch) {
+    state.isSwiping = false;
+
+    el._callback("next");
+  } else if (diffX < -minTouch) {
+    state.isSwiping = false;
+
+    el._callback("prev");
+  }
+}
+
+var touch = {
+  bind: function bind(el, _ref) {
+    var value = _ref.value;
+    if (!value || !el) return;
+    el._callback = value;
+    addListeners(el);
+  },
+  unbind: function unbind(el) {
+    if (!el._callback) return;
+    removeListeners(el);
+    delete el._callback;
+  }
 };//
 //
 //
@@ -360,7 +410,8 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
   },
   directives: {
     ripple: ripple,
-    resize: resize
+    resize: resize,
+    touch: touch
   },
   props: {
     vertical: Boolean,
@@ -481,7 +532,7 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
         }, _callee);
       }))();
     },
-    getPagination: function getPagination() {
+    setPagination: function setPagination() {
       var _this$$refs3, _this$$refs4;
 
       var navItemsElement = (_this$$refs3 = this.$refs) === null || _this$$refs3 === void 0 ? void 0 : _this$$refs3.navItems;
@@ -609,7 +660,7 @@ var __vue_component__$3 = /*#__PURE__*/normalizeComponent({
       var _this2 = this;
 
       this.$nextTick(function () {
-        _this2.getPagination();
+        _this2.setPagination();
 
         _this2.sliderHandler();
       });
@@ -650,7 +701,7 @@ var __vue_render__$2 = function __vue_render__() {
       expression: "resizable"
     }],
     class: _vm.classes
-  }, [_vm._ssrNode("<div class=\"tab__pagination__prev\" data-v-c06add7c>", "</div>", [_vm.pagination.has ? _c('Btn', {
+  }, [_vm._ssrNode("<div class=\"tab__pagination__prev\" data-v-d9f029ca>", "</div>", [_vm.pagination.has ? _c('Btn', {
     attrs: {
       "disabled": !_vm.paginateIndicator.prev
     },
@@ -659,7 +710,16 @@ var __vue_render__$2 = function __vue_render__() {
         return _vm.onPagination('prev');
       }
     }
-  }) : _vm._e()], 1), _vm._ssrNode(" "), _vm._ssrNode("<nav class=\"tab__nav\" data-v-c06add7c>", "</nav>", [_vm._ssrNode("<ul class=\"tab__nav__items\"" + _vm._ssrStyle(null, _vm.styles, null) + " data-v-c06add7c>", "</ul>", [_vm._l(_vm.navItems, function (navItem, index) {
+  }) : _vm._e()], 1), _vm._ssrNode(" "), _c('nav', {
+    directives: [{
+      name: "touch",
+      rawName: "v-touch",
+      value: _vm.onPagination,
+      expression: "onPagination"
+    }],
+    ref: "nav",
+    staticClass: "tab__nav"
+  }, [_vm._ssrNode("<ul class=\"tab__nav__items\"" + _vm._ssrStyle(null, _vm.styles, null) + " data-v-d9f029ca>", "</ul>", [_vm._l(_vm.navItems, function (navItem, index) {
     return _c('li', {
       directives: [{
         name: "ripple",
@@ -687,7 +747,7 @@ var __vue_render__$2 = function __vue_render__() {
         "name": navItem.name
       }
     })], 1);
-  }), _vm._ssrNode(" " + (_vm.navSlider ? "<hr class=\"tab__slider\" data-v-c06add7c>" : "<!---->"))], 2)]), _vm._ssrNode(" "), _vm._ssrNode("<div class=\"tab__pagination__next\" data-v-c06add7c>", "</div>", [_vm.pagination.has ? _c('Btn', {
+  }), _vm._ssrNode(" " + (_vm.navSlider ? "<hr class=\"tab__slider\" data-v-d9f029ca>" : "<!---->"))], 2)]), _vm._ssrNode(" "), _vm._ssrNode("<div class=\"tab__pagination__next\" data-v-d9f029ca>", "</div>", [_vm.pagination.has ? _c('Btn', {
     attrs: {
       "disabled": !_vm.paginateIndicator.next
     },
@@ -704,11 +764,11 @@ var __vue_staticRenderFns__$2 = [];
 
 var __vue_inject_styles__$2 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-c06add7c_0", {
-    source: ".tab__pagination[data-v-c06add7c]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-c06add7c],.tab__pagination__next[data-v-c06add7c]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-c06add7c] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-c06add7c]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-c06add7c]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-c06add7c]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-c06add7c]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-c06add7c]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-c06add7c]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-c06add7c]{background:#f3f2f2}.tab__slider[data-v-c06add7c]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-c06add7c]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-c06add7c]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-c06add7c]{padding:0;margin:0}.tab__pagination--vertical[data-v-c06add7c] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-c06add7c] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-c06add7c]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-c06add7c]:hover{background:#2f3236}.tab__pagination--auto .tab__nav__item[data-v-c06add7c]{flex:1 auto}",
+  inject("data-v-d9f029ca_0", {
+    source: ".tab__pagination[data-v-d9f029ca]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-d9f029ca],.tab__pagination__next[data-v-d9f029ca]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-d9f029ca] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-d9f029ca]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-d9f029ca]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-d9f029ca]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;color:gray;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-d9f029ca]:hover:not(.disabled){background:#faf9f9}.tab__nav__items .active[data-v-d9f029ca]{color:#000;color:#1867c0}.tab__nav__items .active[data-v-d9f029ca]:hover{background:#1b7ef01c!important}.tab__nav__items .disabled[data-v-d9f029ca]{background:#f3f2f2}.tab__slider[data-v-d9f029ca]{height:2px;width:2px;background:#1867c0;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-d9f029ca]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-d9f029ca]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-d9f029ca]{padding:0;margin:0}.tab__pagination--vertical[data-v-d9f029ca] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-d9f029ca] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-d9f029ca]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tabs--dark .tab__nav__item[data-v-d9f029ca]:hover{background:#2f3236}.tab__pagination--auto .tab__nav__item[data-v-d9f029ca]{flex:1 auto}",
     map: undefined,
     media: undefined
-  }), inject("data-v-c06add7c_1", {
+  }), inject("data-v-d9f029ca_1", {
     source: ".ripple{background-color:#1866c04d;border-radius:50%;position:absolute;transform:scale(0);animation:ripple .6s linear;z-index:2}@keyframes ripple{to{transform:scale(2.5);opacity:0}}",
     map: undefined,
     media: undefined
@@ -717,10 +777,10 @@ var __vue_inject_styles__$2 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$2 = "data-v-c06add7c";
+var __vue_scope_id__$2 = "data-v-d9f029ca";
 /* module identifier */
 
-var __vue_module_identifier__$2 = "data-v-c06add7c";
+var __vue_module_identifier__$2 = "data-v-d9f029ca";
 /* functional template */
 
 var __vue_is_functional_template__$2 = false;
@@ -729,56 +789,7 @@ var __vue_is_functional_template__$2 = false;
 var __vue_component__$2 = /*#__PURE__*/normalizeComponent({
   render: __vue_render__$2,
   staticRenderFns: __vue_staticRenderFns__$2
-}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, undefined, createInjectorSSR, undefined);var state = {
-  target: null,
-  touchstartX: 0,
-  touchstartY: 0,
-  isSwiping: 0
-};
-
-function start(e) {
-  if (!e) return;
-  state.isSwiping = true;
-  state.touchstartX = e === null || e === void 0 ? void 0 : e.touches[0].clientX;
-  state.touchstartY = e === null || e === void 0 ? void 0 : e.touches[0].clientY;
-}
-
-function move(e) {
-  var _state$target;
-
-  if (!state.isSwiping || !((_state$target = state.target) !== null && _state$target !== void 0 && _state$target._callback)) return;
-  var touchendX = e === null || e === void 0 ? void 0 : e.changedTouches[0].clientX;
-  var touchendY = e === null || e === void 0 ? void 0 : e.changedTouches[0].clientY;
-  var diffX = state.touchstartX - touchendX;
-  var diffY = state.touchstartY - touchendY;
-  if (diffY > 0 || diffX > 0) state.target._callback("next");else state.target._callback("prev");
-  state.isSwiping = false;
-}
-
-function listeners(add) {
-  [["touchstart", start], ["touchmove", move]].forEach(function (_ref) {
-    var _state$target2;
-
-    var _ref2 = _slicedToArray(_ref, 2),
-        k = _ref2[0],
-        v = _ref2[1];
-
-    state === null || state === void 0 ? void 0 : (_state$target2 = state.target) === null || _state$target2 === void 0 ? void 0 : _state$target2[add ? "addEventListener" : "removeEventListener"](k, v);
-  });
-}
-
-var touch = {
-  inserted: function inserted(el, _ref3) {
-    var value = _ref3.value;
-    if (!value || !el) return;
-    state.target = el;
-    state.target._callback = value;
-    listeners(true);
-  },
-  unbind: function unbind() {
-    listeners(false);
-  }
-};//
+}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, undefined, createInjectorSSR, undefined);//
 var script$1 = {
   name: "Tabs",
   components: {
@@ -1129,7 +1140,7 @@ var __vue_is_functional_template__ = false;
 var __vue_component__ = /*#__PURE__*/normalizeComponent({
   render: __vue_render__,
   staticRenderFns: __vue_staticRenderFns__
-}, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, false, undefined, createInjectorSSR, undefined);/* eslint-disable import/prefer-default-export */var components$1=/*#__PURE__*/Object.freeze({__proto__:null,Tabs: __vue_component__$1,TabItem: __vue_component__});var install = function installVueMaterialTabs(Vue) {
+}, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, false, undefined, createInjectorSSR, undefined);var components$1=/*#__PURE__*/Object.freeze({__proto__:null,Tabs: __vue_component__$1,TabItem: __vue_component__});var install = function installVueMaterialTabs(Vue) {
   Object.entries(components$1).forEach(function (_ref) {
     var _ref2 = _slicedToArray(_ref, 2),
         componentName = _ref2[0],

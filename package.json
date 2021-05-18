@@ -55,5 +55,11 @@
   "engines": {
     "node": ">=12"
   },
-  "repository": "https://github.com/jairoblatt/vue-material-tabs"
+  "repository": "https://github.com/jairoblatt/vue-material-tabs",
+  "keywords": [
+    "vue2",
+    "tabs",
+    "material",
+    "component"
+  ]
 }

@@ -1,26 +1,29 @@
 const state = {
   target: null,
   touchstartX: 0,
-  touchstartY: 0,
-  isSwiping: 0,
+  isSwiping: false,
 };
 
 function start(e) {
   if (!e) return;
   state.isSwiping = true;
-  state.touchstartX = e?.touches[0].clientX;
-  state.touchstartY = e?.touches[0].clientY;
+  state.touchstartX = e.touches[0].clientX;
 }
 
 function move(e) {
-  if (!state.isSwiping || !state.target?._callback) return;
-  const touchendX = e?.changedTouches[0].clientX;
-  const touchendY = e?.changedTouches[0].clientY;
+  if (!state.isSwiping) return;
+  const touchendX = e.changedTouches[0].clientX;
   const diffX = state.touchstartX - touchendX;
-  const diffY = state.touchstartY - touchendY;
-  if (diffY > 0 || diffX > 0) state.target._callback("next");
-  else state.target._callback("prev");
-  state.isSwiping = false;
+  // min touch is 10% of target width
+  const minTouch = state.target.offsetWidth * 0.1;
+
+  if (diffX > minTouch) {
+    state.isSwiping = false;
+    state.target._callback("next");
+  } else if (diffX < -minTouch) {
+    state.isSwiping = false;
+    state.target._callback("prev");
+  }
 }
 
 function listeners(add) {

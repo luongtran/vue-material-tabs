@@ -173,7 +173,7 @@ export default {
       );
     },
 
-    getPagination() {
+    setPagination() {
       const navItemsElement = this.$refs?.navItems;
       const { navItemsWidth } = this.getElementRect({
         el: navItemsElement,
@@ -289,7 +289,7 @@ export default {
 
     resizable() {
       this.$nextTick(() => {
-        this.getPagination();
+        this.setPagination();
         this.sliderHandler();
       });
     },

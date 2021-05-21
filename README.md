@@ -1,8 +1,16 @@
 # vue-material-tabs
 
-Vue.js tabs component based in material design ❤
+Vue 2 tabs component ❤
 
-## [Demo](https://vue-material-tabs.vercel.app/)
+### [Demo](https://vue-material-tabs.vercel.app/)
+
+## ⚓ Features
+
+- Pagination of nav and tabs
+- Pagination touchable
+- Vertical support
+- Very flexible and customizable
+- Multiple style themes
 
 ## 🚚 Install
 
@@ -63,9 +71,11 @@ export default {
 </Tabs>
 ```
 
-### Themes
+### 🏞 Themes
 
-There are some themes available to customize your tab, they are:
+There are some themes available to customize your tab, you can apply them through the "theme" prop.
+
+##### The default theme is, guess what, default, curious isn't it?!
 
 - default
 - purple
@@ -74,11 +84,19 @@ There are some themes available to customize your tab, they are:
 - cyan
 - green
 
-You can create your own personalized themes, through the "theme" prop
+#### Example
 
-#### example
+```python
+<Tabs theme="cyan" >
+  ....
+</Tabs>
+```
 
-```javascript
+You can create your own personalized themes, passing an object with the properties through the "theme" prop.
+
+#### Example
+
+```python
 <Tabs :theme="theme" >
   ....
 </Tabs>

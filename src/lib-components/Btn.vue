@@ -1,6 +1,7 @@
 <template>
   <button class="btn" @click="$emit('click')">
     <svg
+      :style="svgStyle"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       role="img"
@@ -14,6 +15,14 @@
 <script>
 export default {
   name: "Btn",
+
+  inject: ["theme"],
+
+  computed: {
+    svgStyle() {
+      return this.theme?.arrow ? { fill: this.theme.arrow } : "";
+    },
+  },
 };
 </script>
 
@@ -28,10 +37,11 @@ export default {
 .btn svg {
   height: 24px;
   width: 24px;
+  fill: rgba(214, 213, 213, 0.925);
 }
 
 .btn:disabled svg {
-  fill: rgb(214, 213, 213);
+  fill: #d6d6d652 !important;
   cursor: default;
 }
 </style>

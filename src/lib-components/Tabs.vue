@@ -22,6 +22,7 @@
 <script>
 import NavTab from "./TabNav";
 import touch from "./directives/touch";
+import $themes from "./themes";
 
 export default {
   name: "Tabs",
@@ -34,8 +35,17 @@ export default {
     touch,
   },
 
+  provide() {
+    return {
+      theme: this.getTheme,
+    };
+  },
+
   props: {
-    dark: Boolean,
+    theme: {
+      type: [Object, String],
+      default: "default",
+    },
     vertical: Boolean,
     ripple: {
       type: Boolean,
@@ -78,7 +88,6 @@ export default {
       return {
         tabs: true,
         "tabs--vertical": this.vertical,
-        "tabs--dark": this.dark,
       };
     },
 
@@ -89,6 +98,13 @@ export default {
         vertical: this.slideVertical,
         side: this.slideSide,
       };
+    },
+
+    getTheme() {
+      if (typeof this.theme === "string") {
+        return $themes[this.theme] || $themes.default;
+      }
+      return this.theme;
     },
   },
 
@@ -179,6 +195,7 @@ export default {
   border-radius: 0.23rem;
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 .tabs__content {
@@ -194,33 +211,5 @@ export default {
 
 .tabs--vertical {
   flex-direction: row;
-}
-
-.tabs--dark {
-  background: #222831;
-}
-
-.tabs--dark .tabs__nav__item {
-  color: #f1f1f1;
-}
-
-.tabs--dark .tabs__nav__items .active {
-  color: #fff;
-}
-
-.tabs--dark .tabs__nav__items .disabled {
-  background: #2c2f35;
-}
-
-.tabs--dark .tab__pagination >>> .btn svg {
-  fill: rgb(214, 213, 213);
-}
-
-.tabs--dark .tab__pagination >>> .btn:disabled svg {
-  fill: #56575c;
-}
-
-.tabs--dark .tab__pagination >>> .tab__nav__item:hover {
-  background: #424750;
 }
 </style>

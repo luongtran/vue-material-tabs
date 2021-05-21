@@ -11,19 +11,20 @@
       <ul ref="navItems" class="tab__nav__items" :style="styles">
         <li
           v-ripple="ripple && !navItem.disabled"
-          v-for="(navItem, index) in navItems"
-          :key="`tab-item-${index}`"
+          v-for="navItem in navItems"
+          :key="navItem.model"
           :ref="navItem.model"
           class="tab__nav__item"
           :class="{
             active: navItem.model === tabItemActive.model,
             disabled: navItem.disabled,
           }"
+          :style="getActiveColor(navItem)"
           @click.prevent="select(navItem)"
         >
           <VNode :node="navItem.nameSlot" :name="navItem.name" />
         </li>
-        <hr v-if="navSlider" class="tab__slider" />
+        <hr v-if="navSlider" ref="slider" class="tab__slider" />
       </ul>
     </nav>
     <div class="tab__pagination__next">
@@ -52,6 +53,8 @@ export default {
       },
     },
   },
+
+  inject: ["theme"],
 
   directives: {
     ripple,
@@ -120,12 +123,17 @@ export default {
       Object.assign(this.$data, this.$options.data());
       this.resizable();
     },
-    tabItemActive(payload) {
+    tabItemActive(tabItem) {
       this.sliderHandler();
-      if (this.pagination.has) {
-        this.paginationCollapse(payload);
+
+      if (this.pagination.has && tabItem.model) {
+        this.paginationCollapse(tabItem);
       }
     },
+  },
+
+  mounted() {
+    this.setTheme();
   },
 
   methods: {
@@ -146,30 +154,31 @@ export default {
         prefix: "navItems",
       });
 
+      const navActiveElement = this.$refs?.[this.tabItemActive.model]?.[0];
       const {
         navActiveWidth,
         navActiveHeight,
         navActiveLeft,
         navActiveTop,
       } = this.getElementRect({
-        el: this.$refs?.[this.tabItemActive.model]?.[0],
+        el: navActiveElement,
         prefix: "navActive",
       });
 
-      const { children } = navItemsElement;
-      const sliderEl = children[children.length - 1];
-      sliderEl.removeAttribute("style");
-
       Object.assign(
-        sliderEl.style,
+        this.$refs.slider.style,
         {
           portrait: {
             height: `${navActiveHeight}px`,
             top: `${navActiveTop - navItemsTop}px`,
+            width: "",
+            left: "",
           },
           landscape: {
             width: `${navActiveWidth}px`,
             left: `${navActiveLeft - navItemsLeft}px`,
+            height: "",
+            top: "",
           },
         }[this.orientation]
       );
@@ -306,6 +315,19 @@ export default {
       ]);
       return Object.fromEntries(newRect);
     },
+
+    setTheme() {
+      const { nav, navItem, slider } = this.theme;
+      this.$el.style.background = nav;
+      this.$refs.navItems.style.color = navItem;
+      this.$refs.slider.style.background = slider;
+    },
+
+    getActiveColor({ model }) {
+      if (model === this.tabItemActive.model) {
+        return { color: this.theme.navActiveItem };
+      }
+    },
   },
 };
 </script>
@@ -358,7 +380,6 @@ export default {
   justify-content: center;
   align-items: center;
   text-align: center;
-  color: gray;
   text-transform: uppercase;
   font-size: 0.875rem;
   font-weight: 500;
@@ -371,27 +392,21 @@ export default {
   user-select: none;
 }
 
-.tab__nav__items .tab__nav__item:hover:not(.disabled) {
-  background: #faf9f9;
-}
-
-.tab__nav__items .active {
-  color: black;
-  color: #1867c0;
+.tab__nav__items .tab__nav__item:hover:not(.disabled, .active) {
+  background: hsla(0, 0%, 100%, 0.09);
 }
 
 .tab__nav__items .active:hover {
-  background: #1b7ef01c !important;
+  background: hsla(0, 0%, 100%, 0.18);
 }
 
 .tab__nav__items .disabled {
-  background: #f3f2f2;
+  background: #6969694f;
 }
 
 .tab__slider {
   height: 2px;
   width: 2px;
-  background: #1867c0;
   border: none;
   margin: 0;
   padding: 0;
@@ -431,10 +446,6 @@ export default {
   padding-bottom: 1.6rem;
 }
 
-.tabs--dark .tab__nav__item:hover {
-  background: #2f3236;
-}
-
 /* Nav auto */
 .tab__pagination--auto .tab__nav__item {
   flex: 1 auto;
@@ -443,12 +454,12 @@ export default {
 
 <style>
 .ripple {
-  background-color: #1866c04d;
+  z-index: 2;
+  background-color: hsla(0, 0%, 100%, 0.23);
   border-radius: 50%;
   position: absolute;
   transform: scale(0);
   animation: ripple 0.6s linear;
-  z-index: 2;
 }
 
 @keyframes ripple {

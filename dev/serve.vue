@@ -44,6 +44,7 @@
         :nav-slider="slider"
         :dark="dark"
         :slide="slide"
+        theme="purple"
       >
         <TabItem>
           <template #name>

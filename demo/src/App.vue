@@ -35,10 +35,6 @@
         Slider
       </Btn>
 
-      <Btn @click="dark = !dark">
-        Dark
-      </Btn>
-
       <Btn @click="slide = !slide">
         Slide
       </Btn>
@@ -50,8 +46,13 @@
       <Btn @click="disabled = !disabled">
         Disabled
       </Btn>
+
       <Btn @click="add++">
         Add tab
+      </Btn>
+
+      <Btn @click="add--">
+        Remove Tab
       </Btn>
     </div>
 
@@ -61,7 +62,6 @@
           ripple,
           navSlider,
           slide,
-          dark,
           ripple,
           vertical,
           slideVertical,
@@ -95,6 +95,26 @@
         </TabItem>
       </Tabs>
     </div>
+    <div class="sub-title">
+      <h1>🌈 Custom themes</h1>
+      <p>
+        There are some themes available to customize your tab, you can apply
+        <br />
+        them through the "theme" prop.
+      </p>
+    </div>
+    <div class="theme-container">
+      <div v-for="theme in themes" :key="theme" class="tab-theme">
+        <small>{{ theme }}</small>
+        <div class="tabs">
+          <Tabs :theme="theme">
+            <TabItem v-for="i in 6" :key="i" :name="`Tab  ${i}`"
+              >{{ i }}
+            </TabItem>
+          </Tabs>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -120,6 +140,7 @@ export default Vue.extend({
     disabled: false,
     slideVertical: false,
     add: 9,
+    themes: ["default", "purple", "red", "pink", "cyan", "green"],
   }),
 });
 </script>
@@ -133,7 +154,7 @@ body {
   justify-content: center;
   align-content: center;
   background: #f3f3f3;
-  height: 98vh;
+  min-height: 98vh;
   box-sizing: border-box;
 }
 
@@ -143,6 +164,7 @@ body {
   align-items: center;
   flex-direction: column;
   max-width: 60%;
+  margin: 3rem 0;
 }
 
 .btn-group {
@@ -163,7 +185,36 @@ body {
 
 .tab-wrapper {
   height: 610px;
-  width: 1000px;
+  width: 100%;
+}
+
+.theme-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  background: white;
+  padding: 0.7rem 1rem;
+  border-radius: 5px;
+}
+
+.tab-theme {
+  margin-top: 2rem;
+
+  width: 48%;
+}
+
+.tab-theme .tabs {
+  margin-top: 0.4rem;
+  box-shadow: 20px 20px 46px #bebebe79, -20px -20px 46px #ffffff;
+}
+
+.tab-theme small {
+  font-size: 0.8rem;
+  background: #2d3748;
+  border-radius: 3.3px;
+  padding: 3px 5px;
+  color: white;
 }
 
 .tab-content {
@@ -189,6 +240,20 @@ body {
   color: rgb(23, 29, 43);
 }
 
+.sub-title {
+  color: rgb(54, 57, 65);
+  align-self: flex-start;
+  font-size: 0.7rem;
+  margin-top: 2rem;
+}
+
+.sub-title h1 {
+  margin: 0;
+}
+.sub-title p {
+  font-size: 1rem;
+}
+
 .title span {
   padding-left: 20px;
 }
@@ -209,6 +274,10 @@ body {
   .btn-group .btn {
     width: 30%;
     margin: 0.5rem;
+  }
+
+  .tab-theme {
+    width: 100%;
   }
 }
 

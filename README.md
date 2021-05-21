@@ -63,21 +63,56 @@ export default {
 </Tabs>
 ```
 
+### Themes
+
+There are some themes available to customize your tab, they are:
+
+- default
+- purple
+- red
+- pink
+- cyan
+- green
+
+You can create your own personalized themes, through the "theme" prop
+
+#### example
+
+```javascript
+<Tabs :theme="theme" >
+  ....
+</Tabs>
+....
+<script>
+  export default {
+    data: () => ({
+      theme: {
+        nav: "#4A148C",
+        navItem: "#BDBDBD",
+        navActiveItem: "#fff",
+        slider: "#CE93D8",
+        arrow: "#f3f3f3",
+      },
+    }),
+  };
+</script>
+```
+
 ## Tabs
 
 ### Props
 
-| Name          | type             | Default | description                                       |
-| ------------- | ---------------- | ------- | ------------------------------------------------- |
-| dark          | Boolean          | false   | Applies the dark theme.                           |
-| value         | String           | ''      | The designated model value for the component.     |
-| vertical      | Boolean          | false   | Uses a vertical transition when changing windows. |
-| ripple        | Boolean          | true    | enalbe/disable ripple buttons effects.            |
-| slideDuration | String - Number  | 200     | Set time in ms slide duration.                    |
-| slideVertical | Boolean          | false   | enable vertical slide animation.                  |
-| slide         | Boolean - Object | false   | enable/disable slide or set object with props.    |
-| navAuto       | Boolean          | false   | Set nav auto items.                               |
-| navSlider     | Boolean          | true    | Enable/disable slider under nav item.             |
+| Name          | type             | Default   | description                                       |
+| ------------- | ---------------- | --------- | ------------------------------------------------- |
+| value         | String           | ''        | The designated model value for the component.     |
+| theme         | String - Object  | 'default' | Apply a custom theme                              |
+| vertical      | Boolean          | false     | Uses a vertical transition when changing windows. |
+| ripple        | Boolean          | true      | Enalbe/disable ripple buttons effects.            |
+| slideDuration | String - Number  | 200       | Set time in ms slide duration.                    |
+| slideVertical | Boolean          | false     | Enable vertical slide animation.                  |
+| slide         | Boolean - Object | false     | Enable/disable slide or set object with props.    |
+| navAuto       | Boolean          | false     | Set nav auto items.                               |
+| navSlider     | Boolean          | true      | Enable/disable slider under nav item.             |
 
 ### Slots
 

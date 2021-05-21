@@ -103,8 +103,10 @@ export default {
     getTheme() {
       if (typeof this.theme === "string") {
         return $themes[this.theme] || $themes.default;
+      } else if (typeof this.theme === "object" && this.theme !== null) {
+        return this.theme;
       }
-      return this.theme;
+      return $themes.default;
     },
   },
 
@@ -129,11 +131,24 @@ export default {
   },
 
   methods: {
-    setTabItem(tabItemInstance) {
-      if (tabItemInstance?.$options?._componentTag === "TabItem") {
+    addTabItem(tabItemInstance) {
+      if (this.isTabItemComponent(tabItemInstance)) {
         this.tabItems.push(tabItemInstance);
         this.setNavItem(tabItemInstance);
       }
+    },
+
+    removeTabItem(tabItemInstance) {
+      if (this.isTabItemComponent(tabItemInstance)) {
+        this.disableTabItem(tabItemInstance.ownNavItemIndex);
+        this.tabItems.splice(this.findIndexTab(tabItemInstance), 1);
+        this.navItems.splice(tabItemInstance.ownNavItemIndex, 1);
+        this.tabItemIndexes.last = this.navItems.length - 1;
+      }
+    },
+
+    isTabItemComponent({ $options }) {
+      return $options?._componentTag === "TabItem";
     },
 
     setNavItem({ model, name, disabled, $slots }) {
@@ -154,9 +169,9 @@ export default {
       }
     },
 
-    disableTabItem(tabItemIndexesToDisable) {
+    disableTabItem(tabItemIndex) {
       const { current, last } = this.tabItemIndexes;
-      if (tabItemIndexesToDisable === current) {
+      if (tabItemIndex === current) {
         const nextTabItem = current === last ? current - 1 : current + 1;
         this.activeTabItem({
           tabItem: this.navItems[nextTabItem],

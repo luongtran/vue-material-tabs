@@ -123,12 +123,9 @@ export default {
       Object.assign(this.$data, this.$options.data());
       this.resizable();
     },
-    tabItemActive(tabItem) {
+    tabItemActive() {
       this.sliderHandler();
-
-      if (this.pagination.has && tabItem.model) {
-        this.paginationCollapse(tabItem);
-      }
+      this.pagination.has && this.paginationCollapse();
     },
   },
 
@@ -226,6 +223,10 @@ export default {
           ),
         }[this.orientation]
       );
+
+      if (this.pagination.maxOffset === 0) {
+        this.pagination.translate = 0;
+      }
     },
 
     onPagination(to) {

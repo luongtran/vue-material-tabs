@@ -35,6 +35,9 @@
       <Btn @click="add++">
         Adicionar
       </Btn>
+      <Btn @click="add--">
+        Remove
+      </Btn>
     </div>
 
     <div class="tab-wrapper">
@@ -49,21 +52,6 @@
         <TabItem>
           <template #name>
             <span>Custom 🚀</span>
-          </template>
-
-          <div class="tab-content">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Saepe
-            repellendus itaque in, dolore hic explicabo tenetur odit magnam
-            laborum vitae fugiat maiores eum consequuntur libero id. Repudiandae
-            quia et possimus?
-          </div>
-        </TabItem>
-
-        <TabItem>
-          <template #name>
-            <span>
-              <span> 🚚</span>
-            </span>
           </template>
 
           <div class="tab-content">

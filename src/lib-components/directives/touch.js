@@ -41,8 +41,8 @@ export default {
   },
 
   unbind(el) {
-    if (!el._callback) return;
     removeListeners(el);
+    if (!el._callback) return;
     delete el._callback;
   },
 };

@@ -31,7 +31,11 @@ export default {
   }),
 
   mounted() {
-    this.tabs.setTabItem(this);
+    this.tabs.addTabItem(this);
+  },
+
+  beforeDestroy() {
+    this.tabs.removeTabItem(this);
   },
 
   computed: {

@@ -35,7 +35,9 @@ export default {
   },
 
   beforeDestroy() {
-    this.tabs.removeTabItem(this);
+    if (this.tabs) {
+      this.tabs.removeTabItem(this);
+    }
   },
 
   computed: {

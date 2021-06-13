@@ -995,11 +995,13 @@ var $themes = {
       var tabItem = _ref3.tabItem,
           byUser = _ref3.byUser;
 
-      if (!tabItem.disabled) {
-        this.tabItemActive = tabItem;
-        this.$emit("input", tabItem === null || tabItem === void 0 ? void 0 : tabItem.name);
-        byUser && this.$emit("change", tabItem === null || tabItem === void 0 ? void 0 : tabItem.name);
-      }
+      try {
+        if (!tabItem.disabled) {
+          this.tabItemActive = tabItem;
+          this.$emit("input", tabItem === null || tabItem === void 0 ? void 0 : tabItem.name);
+          byUser && this.$emit("change", tabItem === null || tabItem === void 0 ? void 0 : tabItem.name);
+        }
+      } catch (_unused) {}
     },
     disableTabItem: function disableTabItem(tabItemIndex) {
       var _this$tabItemIndexes = this.tabItemIndexes,
@@ -1086,8 +1088,8 @@ var __vue_staticRenderFns__$1 = [];
 
 var __vue_inject_styles__$1 = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-77d7fbea_0", {
-    source: ".tabs[data-v-77d7fbea]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%;overflow:hidden}.tabs__content[data-v-77d7fbea]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-77d7fbea]{flex-direction:row}",
+  inject("data-v-62180c76_0", {
+    source: ".tabs[data-v-62180c76]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%;overflow:hidden}.tabs__content[data-v-62180c76]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-62180c76]{flex-direction:row}",
     map: undefined,
     media: undefined
   });
@@ -1095,10 +1097,10 @@ var __vue_inject_styles__$1 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$1 = "data-v-77d7fbea";
+var __vue_scope_id__$1 = "data-v-62180c76";
 /* module identifier */
 
-var __vue_module_identifier__$1 = "data-v-77d7fbea";
+var __vue_module_identifier__$1 = "data-v-62180c76";
 /* functional template */
 
 var __vue_is_functional_template__$1 = false;

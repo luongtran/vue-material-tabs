@@ -162,11 +162,13 @@ export default {
     },
 
     activeTabItem({ tabItem, byUser }) {
-      if (!tabItem.disabled) {
-        this.tabItemActive = tabItem;
-        this.$emit("input", tabItem?.name);
-        byUser && this.$emit("change", tabItem?.name);
-      }
+      try {
+        if (!tabItem.disabled) {
+          this.tabItemActive = tabItem;
+          this.$emit("input", tabItem?.name);
+          byUser && this.$emit("change", tabItem?.name);
+        }
+      } catch {}
     },
 
     disableTabItem(tabItemIndex) {

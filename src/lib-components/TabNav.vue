@@ -54,6 +54,7 @@ export default {
           attrs: {
             id: props.name
           },
+          ref: props.name
         }, props.name)
       },
     },

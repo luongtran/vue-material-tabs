@@ -50,7 +50,7 @@ export default {
       functional: true,
       render: (h, { props }) => {
         //return props.node ? props.node : h("span", props.name);
-        return props.node ? props.node : createElement('span', {
+        return props.node ? props.node : h('span', {
           attrs: {
             id: props.name
           },

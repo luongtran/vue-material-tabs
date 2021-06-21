@@ -2,7 +2,7 @@
   "name": "vue-material-custom-tabs",
   "version": "0.1.2",
   "description": "Vue.js tabs component based in material design",
-  "author": "Jairo Blatt <jairoblatt@gmail.com>",
+  "author": "Luong Tran <luongtranduc@gmail.com>",
   "scripts": {
     "serve": "vue-cli-service serve dev/serve.js",
     "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
@@ -75,6 +75,13 @@
       "git add"
     ]
   },
-  "repository": "https://github.com/luongtran/vue-material-tabs.git",
-  "sideEffects": false
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luongtran/vue-material-tabs.git"
+  },
+  "sideEffects": false,
+  "bugs": {
+    "url": "https://github.com/luongtran/vue-material-tabs/issues"
+  },
+  "homepage": "https://github.com/luongtran/vue-material-tabs#readme"
 }

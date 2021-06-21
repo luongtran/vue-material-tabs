@@ -22,7 +22,8 @@
           :style="getActiveColor(navItem)"
           @click.prevent="select(navItem)"
         >
-          <VNode :node="navItem.nameSlot" :name="navItem.name" />
+          <!-- <VNode :node="navItem.nameSlot" :name="navItem.name" /> -->
+          <span>{{navItem.name}}</span>
         </li>
         <hr v-if="navSlider" ref="slider" class="tab__slider" />
       </ul>
@@ -46,18 +47,18 @@ import Btn from "./Btn";
 export default {
   components: {
     Btn,
-    VNode: {
-      functional: true,
-      render: (h, { props }) => {
-        //return props.node ? props.node : h("span", props.name);
-        return props.node ? props.node : h('span', {
-          attrs: {
-            id: props.name
-          },
-          ref: props.name
-        }, props.name)
-      },
-    },
+    // VNode: {
+    //   functional: true,
+    //   render: (h, { props }) => {
+    //     //return props.node ? props.node : h("span", props.name);
+    //     return props.node ? props.node : h('span', {
+    //       attrs: {
+    //         id: props.name
+    //       },
+    //       ref: props.name
+    //     }, props.name)
+    //   },
+    // },
   },
 
   inject: ["theme"],

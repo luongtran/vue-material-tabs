@@ -340,21 +340,19 @@ const __vue_component__$3 = /*#__PURE__*/normalizeComponent({
 //
 var script$2 = {
   components: {
-    Btn: __vue_component__$3,
-    VNode: {
-      functional: true,
-      render: (h, {
-        props
-      }) => {
-        //return props.node ? props.node : h("span", props.name);
-        return props.node ? props.node : h('span', {
-          attrs: {
-            id: props.name
-          },
-          ref: props.name
-        }, props.name);
-      }
-    }
+    Btn: __vue_component__$3 // VNode: {
+    //   functional: true,
+    //   render: (h, { props }) => {
+    //     //return props.node ? props.node : h("span", props.name);
+    //     return props.node ? props.node : h('span', {
+    //       attrs: {
+    //         id: props.name
+    //       },
+    //       ref: props.name
+    //     }, props.name)
+    //   },
+    // },
+
   },
   inject: ["theme"],
   directives: {
@@ -713,12 +711,7 @@ var __vue_render__$2 = function () {
           return _vm.select(navItem);
         }
       }
-    }, [_c('VNode', {
-      attrs: {
-        "node": navItem.nameSlot,
-        "name": navItem.name
-      }
-    })], 1);
+    }, [_c('span', [_vm._v(_vm._s(navItem.name))])]);
   }), _vm._v(" "), _vm.navSlider ? _c('hr', {
     ref: "slider",
     staticClass: "tab__slider"
@@ -741,11 +734,11 @@ var __vue_staticRenderFns__$2 = [];
 
 const __vue_inject_styles__$2 = function (inject) {
   if (!inject) return;
-  inject("data-v-208448b6_0", {
-    source: ".tab__pagination[data-v-208448b6]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-208448b6],.tab__pagination__next[data-v-208448b6]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-208448b6] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-208448b6]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-208448b6]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-208448b6]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-208448b6]:hover:not(.disabled,.active){background:hsla(0,0%,100%,.09)}.tab__nav__items .active[data-v-208448b6]:hover{background:hsla(0,0%,100%,.18)}.tab__nav__items .disabled[data-v-208448b6]{background:#6969694f}.tab__slider[data-v-208448b6]{height:2px;width:2px;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-208448b6]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-208448b6]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-208448b6]{padding:0;margin:0}.tab__pagination--vertical[data-v-208448b6] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-208448b6] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-208448b6]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tab__pagination--auto .tab__nav__item[data-v-208448b6]{flex:1 auto}",
+  inject("data-v-3ca0ff7a_0", {
+    source: ".tab__pagination[data-v-3ca0ff7a]{display:flex;justify-content:space-between;align-items:center;vertical-align:middle;max-width:100%;flex:0 1 auto;position:relative;contain:content}.tab__pagination .tab__pagination__prev[data-v-3ca0ff7a],.tab__pagination__next[data-v-3ca0ff7a]{flex:1 40px;min-width:40px}.tab__pagination__next[data-v-3ca0ff7a] .btn svg{transform:rotate(180deg)}.tab__nav[data-v-3ca0ff7a]{position:relative;display:flex;overflow:hidden;flex:1 100%}.tab__nav__items[data-v-3ca0ff7a]{display:flex;margin:0;padding:0;flex:1 auto;transition:.3s cubic-bezier(.25,.8,.5,1);height:100%}.tab__nav__items .tab__nav__item[data-v-3ca0ff7a]{list-style:none;text-align:center;cursor:pointer;padding:.9rem 1rem;letter-spacing:.0892857143em;display:flex;justify-content:center;align-items:center;text-align:center;text-transform:uppercase;font-size:.875rem;font-weight:500;white-space:normal;transition:background .1s ease;position:relative;overflow:hidden;min-width:90px;max-width:360px;user-select:none}.tab__nav__items .tab__nav__item[data-v-3ca0ff7a]:hover:not(.disabled,.active){background:hsla(0,0%,100%,.09)}.tab__nav__items .active[data-v-3ca0ff7a]:hover{background:hsla(0,0%,100%,.18)}.tab__nav__items .disabled[data-v-3ca0ff7a]{background:#6969694f}.tab__slider[data-v-3ca0ff7a]{height:2px;width:2px;border:none;margin:0;padding:0;bottom:0;position:absolute;transition:left .3s cubic-bezier(.25,.8,.5,1),top .3s cubic-bezier(.25,.8,.5,1)}.tab__pagination--vertical[data-v-3ca0ff7a]{flex-direction:column}.tab__pagination--vertical .tab__nav__items[data-v-3ca0ff7a]{flex-direction:column;flex:1 auto;position:relative}.tab__pagination--vertical .tab__nav__item *[data-v-3ca0ff7a]{padding:0;margin:0}.tab__pagination--vertical[data-v-3ca0ff7a] .tab__pagination__prev svg{transform:rotate(90deg)}.tab__pagination--vertical[data-v-3ca0ff7a] .tab__pagination__next svg{transform:rotate(270deg)}.tab__pagination--vertical .tab__nav__item[data-v-3ca0ff7a]{justify-content:left;padding-top:1.6rem;padding-bottom:1.6rem}.tab__pagination--auto .tab__nav__item[data-v-3ca0ff7a]{flex:1 auto}",
     map: undefined,
     media: undefined
-  }), inject("data-v-208448b6_1", {
+  }), inject("data-v-3ca0ff7a_1", {
     source: ".ripple{z-index:2;background-color:hsla(0,0%,100%,.23);border-radius:50%;position:absolute;transform:scale(0);animation:ripple .6s linear}@keyframes ripple{to{transform:scale(2.5);opacity:0}}",
     map: undefined,
     media: undefined
@@ -754,7 +747,7 @@ const __vue_inject_styles__$2 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$2 = "data-v-208448b6";
+const __vue_scope_id__$2 = "data-v-3ca0ff7a";
 /* module identifier */
 
 const __vue_module_identifier__$2 = undefined;

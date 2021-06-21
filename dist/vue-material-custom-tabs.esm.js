@@ -1139,13 +1139,14 @@ var script = {
 
       payload && ((_this$tabs = this.tabs) === null || _this$tabs === void 0 ? void 0 : _this$tabs.disableTabItem(this.ownNavItemIndex));
       this.tabs.navItems[this.ownNavItemIndex].disabled = payload;
-    },
+    } // name: {
+    //   handler(newItem, oldItem) {
+    //     if(newItem != oldItem) {
+    //     }
+    //   }
+    // }
 
-    name: {
-      handler(newItem, oldItem) {
-      }
 
-    }
   }
 };
 
@@ -1183,8 +1184,8 @@ var __vue_staticRenderFns__ = [];
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-35437f1a_0", {
-    source: ".tab-item[data-v-35437f1a]{position:absolute;top:0;left:0;z-index:1;height:100%;width:100%;transition:transform cubic-bezier(.25,.8,.5,1)}.slide-left-enter[data-v-35437f1a],.slide-right-leave-to[data-v-35437f1a]{transform:translateX(-100%)}.slide-left-leave-to[data-v-35437f1a],.slide-right-enter[data-v-35437f1a]{transform:translateX(100%)}.slide-bottom-leave-to[data-v-35437f1a],.slide-top-enter[data-v-35437f1a]{transform:translateY(-100%)}.slide-bottom-enter[data-v-35437f1a],.slide-top-leave-to[data-v-35437f1a]{transform:translateY(100%)}",
+  inject("data-v-11cd968d_0", {
+    source: ".tab-item[data-v-11cd968d]{position:absolute;top:0;left:0;z-index:1;height:100%;width:100%;transition:transform cubic-bezier(.25,.8,.5,1)}.slide-left-enter[data-v-11cd968d],.slide-right-leave-to[data-v-11cd968d]{transform:translateX(-100%)}.slide-left-leave-to[data-v-11cd968d],.slide-right-enter[data-v-11cd968d]{transform:translateX(100%)}.slide-bottom-leave-to[data-v-11cd968d],.slide-top-enter[data-v-11cd968d]{transform:translateY(-100%)}.slide-bottom-enter[data-v-11cd968d],.slide-top-leave-to[data-v-11cd968d]{transform:translateY(100%)}",
     map: undefined,
     media: undefined
   });
@@ -1192,7 +1193,7 @@ const __vue_inject_styles__ = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__ = "data-v-35437f1a";
+const __vue_scope_id__ = "data-v-11cd968d";
 /* module identifier */
 
 const __vue_module_identifier__ = undefined;

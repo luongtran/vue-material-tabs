@@ -81,6 +81,13 @@ export default {
       payload && this.tabs?.disableTabItem(this.ownNavItemIndex);
       this.tabs.navItems[this.ownNavItemIndex].disabled = payload;
     },
+    // name: {
+    //   handler(newItem, oldItem) {
+    //     if(newItem != oldItem) {
+
+    //     }
+    //   }
+    // }
   },
 };
 </script>

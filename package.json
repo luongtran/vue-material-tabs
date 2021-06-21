@@ -1,5 +1,5 @@
 {
-  "name": "vue-material-tabs",
+  "name": "vue-material-custom-tabs",
   "version": "0.1.2",
   "description": "Vue.js tabs component based in material design",
   "author": "Jairo Blatt <jairoblatt@gmail.com>",
@@ -13,10 +13,10 @@
     "test": "jest",
     "test:watch": "jest --watchAll"
   },
-  "main": "dist/vue-material-tabs.ssr.js",
-  "module": "dist/vue-material-tabs.esm.js",
-  "browser": "dist/vue-material-tabs.esm.js",
-  "unpkg": "dist/vue-material-tabs.min.js",
+  "main": "dist/vue-material-custom-tabs.ssr.js",
+  "module": "dist/vue-material-custom-tabs.esm.js",
+  "browser": "dist/vue-material-custom-tabs.esm.js",
+  "unpkg": "dist/vue-material-custom-tabs.min.js",
   "files": [
     "dist/*",
     "src/**/*.vue"
@@ -75,6 +75,6 @@
       "git add"
     ]
   },
-  "repository": "https://github.com/jairoblatt/vue-material-tabs",
+  "repository": "https://github.com/luongtran/vue-material-tabs.git",
   "sideEffects": false
 }

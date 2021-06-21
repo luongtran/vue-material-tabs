@@ -84,7 +84,7 @@ if (!argv.format || argv.format === 'es') {
     input: 'src/entry.esm.js',
     external,
     output: {
-      file: 'dist/vue-material-tabs.esm.js',
+      file: 'dist/vue-material-custom-tabs.esm.js',
       format: 'esm',
       exports: 'named',
     },
@@ -116,9 +116,9 @@ if (!argv.format || argv.format === 'cjs') {
     external,
     output: {
       compact: true,
-      file: 'dist/vue-material-tabs.ssr.js',
+      file: 'dist/vue-material-custom-tabs.ssr.js',
       format: 'cjs',
-      name: 'VueMaterialTabs',
+      name: 'VueMaterialCustomTabs',
       exports: 'auto',
       globals,
     },
@@ -145,7 +145,7 @@ if (!argv.format || argv.format === 'iife') {
     external,
     output: {
       compact: true,
-      file: 'dist/vue-material-tabs.min.js',
+      file: 'dist/vue-material-custom-tabs.min.js',
       format: 'iife',
       name: 'VueMaterialTabs',
       exports: 'auto',

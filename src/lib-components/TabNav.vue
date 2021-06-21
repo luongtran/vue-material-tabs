@@ -49,7 +49,12 @@ export default {
     VNode: {
       functional: true,
       render: (h, { props }) => {
-        return props.node ? props.node : h("span", props.name);
+        //return props.node ? props.node : h("span", props.name);
+        return props.node ? props.node : createElement('span', {
+          attrs: {
+            id: props.name
+          },
+        }, props.name)
       },
     },
   },

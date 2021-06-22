@@ -161,6 +161,10 @@ export default {
       this.tabItemIndexes.last = this.navItems.length - 1;
     },
 
+    setNavItems(navItems) {
+      this.navItems = navItems;
+    },
+
     activeTabItem({ tabItem, byUser }) {
       try {
         if (!tabItem.disabled) {
@@ -168,7 +172,13 @@ export default {
           this.$emit("input", tabItem?.name);
           byUser && this.$emit("change", tabItem?.name);
         }
-      } catch {}
+      } catch {
+        console.log("-------- ERROR in set active TabItem ------");
+      }
+    },
+
+    currentNavItems() {
+      return this.navItems;
     },
 
     disableTabItem(tabItemIndex) {

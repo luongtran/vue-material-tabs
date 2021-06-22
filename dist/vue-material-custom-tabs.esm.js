@@ -925,6 +925,10 @@ var script$1 = {
       this.tabItemIndexes.last = this.navItems.length - 1;
     },
 
+    setNavItems(navItems) {
+      this.navItems = navItems;
+    },
+
     activeTabItem({
       tabItem,
       byUser
@@ -936,6 +940,10 @@ var script$1 = {
           byUser && this.$emit("change", tabItem === null || tabItem === void 0 ? void 0 : tabItem.name);
         }
       } catch {}
+    },
+
+    currentNavItems() {
+      return this.navItems;
     },
 
     disableTabItem(tabItemIndex) {
@@ -1030,8 +1038,8 @@ var __vue_staticRenderFns__$1 = [];
 
 const __vue_inject_styles__$1 = function (inject) {
   if (!inject) return;
-  inject("data-v-6491b6c7_0", {
-    source: ".tabs[data-v-6491b6c7]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%;overflow:hidden}.tabs__content[data-v-6491b6c7]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-6491b6c7]{flex-direction:row}",
+  inject("data-v-4900bd37_0", {
+    source: ".tabs[data-v-4900bd37]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%;overflow:hidden}.tabs__content[data-v-4900bd37]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-4900bd37]{flex-direction:row}",
     map: undefined,
     media: undefined
   });
@@ -1039,7 +1047,7 @@ const __vue_inject_styles__$1 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$1 = "data-v-6491b6c7";
+const __vue_scope_id__$1 = "data-v-4900bd37";
 /* module identifier */
 
 const __vue_module_identifier__$1 = undefined;
@@ -1133,13 +1141,30 @@ var script = {
 
       payload && ((_this$tabs = this.tabs) === null || _this$tabs === void 0 ? void 0 : _this$tabs.disableTabItem(this.ownNavItemIndex));
       this.tabs.navItems[this.ownNavItemIndex].disabled = payload;
-    } // name: {
-    //   handler(newItem, oldItem) {
-    //     if(newItem != oldItem) {
-    //     }
-    //   }
-    // }
+    },
 
+    name: {
+      handler(newName, oldName) {
+        if (newName != oldName) {
+          this.resetTabItemName(oldName, newName);
+        }
+      }
+
+    }
+  },
+  methods: {
+    resetTabItemName(oldName, name) {
+      let navItems = this.tabs.currentNavItems();
+      let navItem = navItems.find(item => item.name == oldName);
+      let index = navItems.findIndex(item => item.name == oldName);
+
+      if (navItem) {
+        navItem.name = name;
+        navItems[index] = navItem;
+      }
+
+      this.tabs.setNavItems(navItems);
+    }
 
   }
 };
@@ -1178,8 +1203,8 @@ var __vue_staticRenderFns__ = [];
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-11cd968d_0", {
-    source: ".tab-item[data-v-11cd968d]{position:absolute;top:0;left:0;z-index:1;height:100%;width:100%;transition:transform cubic-bezier(.25,.8,.5,1)}.slide-left-enter[data-v-11cd968d],.slide-right-leave-to[data-v-11cd968d]{transform:translateX(-100%)}.slide-left-leave-to[data-v-11cd968d],.slide-right-enter[data-v-11cd968d]{transform:translateX(100%)}.slide-bottom-leave-to[data-v-11cd968d],.slide-top-enter[data-v-11cd968d]{transform:translateY(-100%)}.slide-bottom-enter[data-v-11cd968d],.slide-top-leave-to[data-v-11cd968d]{transform:translateY(100%)}",
+  inject("data-v-4f081290_0", {
+    source: ".tab-item[data-v-4f081290]{position:absolute;top:0;left:0;z-index:1;height:100%;width:100%;transition:transform cubic-bezier(.25,.8,.5,1)}.slide-left-enter[data-v-4f081290],.slide-right-leave-to[data-v-4f081290]{transform:translateX(-100%)}.slide-left-leave-to[data-v-4f081290],.slide-right-enter[data-v-4f081290]{transform:translateX(100%)}.slide-bottom-leave-to[data-v-4f081290],.slide-top-enter[data-v-4f081290]{transform:translateY(-100%)}.slide-bottom-enter[data-v-4f081290],.slide-top-leave-to[data-v-4f081290]{transform:translateY(100%)}",
     map: undefined,
     media: undefined
   });
@@ -1187,7 +1212,7 @@ const __vue_inject_styles__ = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__ = "data-v-11cd968d";
+const __vue_scope_id__ = "data-v-4f081290";
 /* module identifier */
 
 const __vue_module_identifier__ = undefined;

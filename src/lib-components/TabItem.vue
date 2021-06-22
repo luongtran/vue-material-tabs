@@ -81,14 +81,26 @@ export default {
       payload && this.tabs?.disableTabItem(this.ownNavItemIndex);
       this.tabs.navItems[this.ownNavItemIndex].disabled = payload;
     },
-    // name: {
-    //   handler(newItem, oldItem) {
-    //     if(newItem != oldItem) {
-
-    //     }
-    //   }
-    // }
+    name: {
+      handler(newName, oldName) {
+        if(newName != oldName) {
+          this.resetTabItemName(oldName, newName);
+        }
+      }
+    }
   },
+  methods: {
+    resetTabItemName(oldName, name) {
+      let navItems = this.tabs.currentNavItems();
+      let navItem = navItems.find(item => item.name == oldName);
+      let index = navItems.findIndex(item => item.name == oldName);
+      if(navItem) {
+        navItem.name = name;
+        navItems[index] = navItem;
+      }
+      this.tabs.setNavItems(navItems);
+    }
+  }
 };
 </script>
 

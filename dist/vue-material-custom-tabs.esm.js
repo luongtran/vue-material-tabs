@@ -939,7 +939,9 @@ var script$1 = {
           this.$emit("input", tabItem === null || tabItem === void 0 ? void 0 : tabItem.name);
           byUser && this.$emit("change", tabItem === null || tabItem === void 0 ? void 0 : tabItem.name);
         }
-      } catch {}
+      } catch {
+        console.log("-------- ERROR in set active TabItem ------");
+      }
     },
 
     currentNavItems() {
@@ -1038,8 +1040,8 @@ var __vue_staticRenderFns__$1 = [];
 
 const __vue_inject_styles__$1 = function (inject) {
   if (!inject) return;
-  inject("data-v-4900bd37_0", {
-    source: ".tabs[data-v-4900bd37]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%;overflow:hidden}.tabs__content[data-v-4900bd37]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-4900bd37]{flex-direction:row}",
+  inject("data-v-bb9019ce_0", {
+    source: ".tabs[data-v-bb9019ce]{background:#fff;display:flex;flex-direction:column;border-radius:.23rem;height:100%;width:100%;overflow:hidden}.tabs__content[data-v-bb9019ce]{display:flex;position:relative;overflow:hidden;justify-content:center;align-items:center;height:100%;width:100%;flex:1 100%}.tabs--vertical[data-v-bb9019ce]{flex-direction:row}",
     map: undefined,
     media: undefined
   });
@@ -1047,7 +1049,7 @@ const __vue_inject_styles__$1 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$1 = "data-v-4900bd37";
+const __vue_scope_id__$1 = "data-v-bb9019ce";
 /* module identifier */
 
 const __vue_module_identifier__$1 = undefined;

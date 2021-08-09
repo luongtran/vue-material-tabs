@@ -172,8 +172,8 @@ export default {
           this.$emit("input", tabItem?.name);
           byUser && this.$emit("change", tabItem?.name);
         }
-      } catch {
-        console.log("-------- ERROR in set active TabItem ------");
+      } catch(err) {
+        console.log("-------- ERROR in set active TabItem ------", err);
       }
     },
 
